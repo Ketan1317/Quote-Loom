@@ -294,12 +294,12 @@ const OwnQuotes = () => {
       </nav>
 
       {/* Header */}
-      <div className="text-center py-12 bg-gradient-to-b from-black to-blue-900/10">
+      <div className="text-center py-12 relative bg-gradient-to-b from-black to-blue-900/10">
         <h1 className="text-6xl flex items-center justify-center gap-4 font-bold text-white mb-4">
           <IoMdAdd className="text-blue-400" />
           <span>Create</span>
         </h1>
-        <p className="text-xl text-blue-200/80">Share your thoughts with the world</p>
+        <p className="text-xl font-bold absolute left-[600px]  text-blue-200/80">Share your thoughts with the world</p>
       </div>
 
       <div className="max-w-6xl mx-auto px-4 mb-20">
@@ -310,7 +310,7 @@ const OwnQuotes = () => {
               <h2 className="text-3xl font-bold text-white mb-10">AI Quote Generator</h2>
               <div className="space-y-4">
                 <div className="flex gap-3">
-                  <input
+                  <inputcreate
                     type="text"
                     value={aiPrompt}
                     onChange={(e) => setAiPrompt(e.target.value)}
