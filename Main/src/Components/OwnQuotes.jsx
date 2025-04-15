@@ -5,12 +5,10 @@ import { IoSend } from "react-icons/io5";
 import { FiFilter, FiCalendar } from "react-icons/fi";
 import { AiOutlineLoading3Quarters } from "react-icons/ai";
 import { BsSortAlphaDown, BsSortAlphaUp } from "react-icons/bs";
-import { FaImages } from "react-icons/fa";
 import { IoMdAdd } from "react-icons/io";
 import { FaQuoteLeft } from "react-icons/fa";
 import { FaGamepad } from "react-icons/fa6";
 import { CgProfile } from "react-icons/cg";
-import ExpandableQuoteCard from "./ExpandableQuoteCard";
 import { HeroParallax } from "../Ui/hero-parallax";
 import { BackgroundBeamsWithCollision } from "../Ui/background-beams-with-collision";
 
@@ -31,6 +29,7 @@ const OwnQuotes = () => {
   const [showNotification, setShowNotification] = useState(false);
   const [notificationQuote, setNotificationQuote] = useState("");
 
+  // Define the quoteDatabase
   const quoteDatabase = {
     motivation: [
       "Success is not final, failure is not fatal: it is the courage to continue that counts.",
@@ -205,8 +204,8 @@ const OwnQuotes = () => {
   };
 
   const sortedQuotes = [...quotes].sort((a, b) => {
-    if (sortOrder === "newest") return b.createdAt.localeCompare(a.createdAt);
-    if (sortOrder === "oldest") return a.createdAt.localeCompare(b.createdAt);
+    if (sortOrder === "newest") return new Date(b.createdAt) - new Date(a.createdAt);
+    if (sortOrder === "oldest") return new Date(a.createdAt) - new Date(b.createdAt);
     if (sortOrder === "mostLiked") return b.likes - a.likes;
     if (sortOrder === "alphabetical") return a.text.localeCompare(b.text);
     return 0;
@@ -216,97 +215,10 @@ const OwnQuotes = () => {
     filterType === "all" ? true : quote.type === filterType
   );
 
-  const heroQuotes = filteredQuotes.map((quote, index) => ({
-    title: quote.type.charAt(0).toUpperCase() + quote.type.slice(1),
-    link: "#",
-    thumbnail: (
-      <div className="group relative h-full w-full overflow-hidden rounded-xl border border-white/10 bg-black/50 backdrop-blur-md">
-        <div className="absolute inset-0 bg-gradient-to-b from-blue-500/10 to-black/50 opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
-        <div className="relative h-full p-8 flex flex-col justify-between">
-          <div className="text-2xl text-white font-medium mb-4">"{quote.text}"</div>
-          <div className="text-[#00B7EB] text-sm">- {quote.context || "Anonymous"}</div>
-          <div className="absolute bottom-4 right-4 flex gap-2 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
-            <button onClick={() => handleLike(quote.id)} className="p-2 bg-white/10 rounded-full hover:bg-white/20">
-              <FaHeart className="text-white" />
-            </button>
-            <button onClick={() => handleShare(quote)} className="p-2 bg-white/10 rounded-full hover:bg-white/20">
-              <FaShare className="text-white" />
-            </button>
-          </div>
-        </div>
-      </div>
-    ),
-  }));
-
-  const products = [
-    {
-      title: "Your Quotes",
-      link: "#quotes",
-      thumbnail: (
-        <div className="bg-white/5 backdrop-blur-md rounded-lg p-6 border border-white/10">
-          <div className="space-y-6">
-            {filteredQuotes.slice(0, 3).map((quote) => (
-              <div key={quote.id} className="p-4 bg-black/50 rounded-lg border border-white/10">
-                <p className="text-white italic">"{quote.text}"</p>
-                <p className="text-white/60 text-sm mt-2">- {quote.context || "Anonymous"}</p>
-              </div>
-            ))}
-          </div>
-        </div>
-      ),
-    },
-    {
-      title: "AI Generator",
-      link: "#ai",
-      thumbnail: (
-        <div className="bg-white/5 backdrop-blur-md rounded-lg p-6 border border-white/90">
-          <h3 className="text-white text-xl font-bold mb-4">Generate Quotes</h3>
-          <div className="space-y-4">
-            <input
-              type="text"
-              value={aiPrompt}
-              onChange={(e) => setAiPrompt(e.target.value)}
-              placeholder="Enter a keyword..."
-              className="w-full p-3 bg-black/50 border border-white/10 text-white rounded-lg focus:border-white/20 focus:ring-2 focus:ring-white/10"
-            />
-            <button
-              onClick={() => generateAIQuote(aiPrompt)}
-              className="w-full py-2 bg-white text-black rounded-lg font-medium hover:bg-white/90 transition-all"
-            >
-              Generate
-            </button>
-          </div>
-        </div>
-      ),
-    },
-    {
-      title: "Create Quote",
-      link: "#create",
-      thumbnail: (
-        <div className="bg-white/5 backdrop-blur-md rounded-lg p-6 border border-white/10">
-          <h3 className="text-white text-xl font-bold mb-4">Create New Quote</h3>
-          <div className="space-y-4">
-            <textarea
-              value={newQuote}
-              onChange={(e) => setNewQuote(e.target.value)}
-              placeholder="Write your quote..."
-              className="w-full p-3 bg-black/50 border border-white/10 text-white rounded-lg focus:border-white/20 focus:ring-2 focus:ring-white/10"
-              rows="3"
-            />
-            <button
-              onClick={handleSubmit}
-              className="w-full py-2 bg-white text-black rounded-lg font-medium hover:bg-white/90 transition-all"
-            >
-              Post Quote
-            </button>
-          </div>
-        </div>
-      ),
-    },
-  ];
-
   return (
-    <div className="min-h-screen bg-black text-white">
+    <div className="min-h-screen bg-black pb-6 text-white relative">
+      <BackgroundBeamsWithCollision className="absolute inset-0 opacity-50" />
+      
       <style>
         {`
           @keyframes slideDown {
@@ -321,27 +233,24 @@ const OwnQuotes = () => {
             0% { opacity: 0; }
             100% { opacity: 1; }
           }
-          @keyframes buttonPulse {
-            0%, 100% { transform: scale(1); }
-            50% { transform: scale(1.05); }
-          }
         `}
       </style>
 
+      {/* Notification */}
       {showNotification && (
         <div className="fixed top-20 left-1/2 transform -translate-x-1/2 z-50 max-w-lg w-full px-4">
           <div
-            className="bg-black/90 backdrop-blur-md border border-white/30 rounded-lg p-4 shadow-[0_0_10px_rgba(255,255,255,0.2)]"
+            className="bg-black/90 backdrop-blur-md border border-blue-500/30 rounded-lg p-4 shadow-[0_0_10px_rgba(59,130,246,0.3)]"
             style={{ animation: "slideDown 0.5s ease-in-out forwards" }}
           >
             <div className="flex items-center justify-between">
               <div>
                 <p className="text-white text-base font-medium">"{notificationQuote}"</p>
-                <p className="text-white text-sm">Quote posted successfully!</p>
+                <p className="text-blue-300 text-sm">Quote posted successfully!</p>
               </div>
               <button
                 onClick={() => setShowNotification(false)}
-                className="text-gray-400 hover:text-white transition-colors duration-300"
+                className="text-blue-300 hover:text-white transition-colors duration-300"
               >
                 <FaTimes size={18} />
               </button>
@@ -350,190 +259,278 @@ const OwnQuotes = () => {
         </div>
       )}
 
-      <nav className="sticky top-0 z-50 bg-black/90 backdrop-blur-md px-6 py-4 shadow-[0_2px_4px_rgba(255,255,255,0.1)]">
+      {/* Navigation */}
+      <nav className="sticky top-0 z-50 bg-black/95 backdrop-blur-md px-6 py-4 border-b border-blue-500/20">
         <div className="max-w-7xl mx-auto flex items-center justify-between">
           <NavLink
             to="/"
-            className="text-4xl font-bold text-white font-[playball] hover:text-white/80 transition-colors duration-300"
+            className="text-4xl font-bold text-white font-[playball] hover:text-blue-300 transition-colors duration-300"
           >
             Quote Loom
           </NavLink>
           <ul className="hidden md:flex items-center gap-14">
-            <li>
-              <NavLink
-                to="/dashboard"
-                className={({ isActive }) =>
-                  `text-xl font-semibold flex items-center gap-2 transition-colors duration-300 ${
-                    isActive ? "text-white border-b-2 border-white" : "text-white/80 hover:text-white"
-                  }`
-                }
-              >
-                <FaQuoteLeft />Dashboard
-              </NavLink>
-            </li>
-            <li>
-              <NavLink
-                to="/quotes"
-                className={({ isActive }) =>
-                  `text-xl font-semibold flex items-center gap-2 transition-colors duration-300 ${
-                    isActive ? "text-white border-b-2 border-white" : "text-white/80 hover:text-white"
-                  }`
-                }
-              >
-                <FaImages />Create
-              </NavLink>
-            </li>
-            <li>
-              <NavLink
-                to="/own-quotes"
-                className={({ isActive }) =>
-                  `text-xl font-semibold transition-colors flex items-center gap-2 duration-300 ${
-                    isActive ? "text-white border-b-2 border-white" : "text-white/80 hover:text-white"
-                  }`
-                }
-              >
-                <IoMdAdd />Post
-              </NavLink>
-            </li>
-            <li>
-              <NavLink
-                to="/game"
-                className={({ isActive }) =>
-                  `text-xl font-semibold flex items-center gap-2 transition-colors duration-300 ${
-                    isActive ? "text-white border-b-2 border-white" : "text-white/80 hover:text-white"
-                  }`
-                }
-              >
-                <FaGamepad />Game
-              </NavLink>
-            </li>
-            <li>
-              <NavLink
-                to="/profile"
-                className={({ isActive }) =>
-                  `text-xl font-semibold flex items-center gap-2 transition-colors duration-300 ${
-                    isActive ? "text-white border-b-2 border-white" : "text-white/80 hover:text-white"
-                  }`
-                }
-              >
-                <CgProfile />Profile
-              </NavLink>
-            </li>
+            {[
+              { to: "/dashboard", icon: FaQuoteLeft, text: "Dashboard" },
+              { to: "/quotes", icon: FaQuoteLeft, text: "Create" },
+              { to: "/own-quotes", icon: IoMdAdd, text: "Post" },
+              { to: "/game", icon: FaGamepad, text: "Game" },
+              { to: "/profile", icon: CgProfile, text: "Profile" },
+            ].map((item) => (
+              <li key={item.to}>
+                <NavLink
+                  to={item.to}
+                  className={({ isActive }) =>
+                    `text-xl font-semibold flex items-center gap-2 transition-colors duration-300 ${
+                      isActive ? "text-blue-300 border-b-2 border-blue-300" : "text-white/70 hover:text-blue-300"
+                    }`
+                  }
+                >
+                  <item.icon /> {item.text}
+                </NavLink>
+              </li>
+            ))}
           </ul>
         </div>
       </nav>
 
-      <div className="relative">
-        <div className="text-center py-12 bg-gradient-to-b from-black to-black/95">
-          <h1 className="text-6xl flex items-center justify-center gap-4 font-bold text-white mb-4">
-            <IoMdAdd className="text-[#00B7EB]" />
-            <span>Create</span>
-          </h1>
-          <p className="text-xl text-white/80">Share your thoughts with the world</p>
-        </div>
+      {/* Header */}
+      <div className="text-center py-12 bg-gradient-to-b from-black to-blue-900/10">
+        <h1 className="text-6xl flex items-center justify-center gap-4 font-bold text-white mb-4">
+          <IoMdAdd className="text-blue-400" />
+          <span>Create</span>
+        </h1>
+        <p className="text-xl text-blue-200/80">Share your thoughts with the world</p>
+      </div>
 
-        <div className="max-w-6xl mx-auto px-4 mb-20">
-          <section className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-            {/* AI Quote Generator */}
-            <div className="lg:col-span-1">
-              <div
-                className="bg-black/50 backdrop-blur-md rounded-lg p-6 border border-white/10 hover:border-[#00B7EB]/30 transition-colors duration-300"
-                style={{ animation: "fadeIn 0.6s ease-in-out forwards" }}
-              >
-                <h2 className="text-3xl font-bold text-white mb-10">AI Quote Generator</h2>
-                <div className="space-y-4">
-                  <div className="flex gap-3">
-                    <input
-                      type="text"
-                      value={aiPrompt}
-                      onChange={(e) => setAiPrompt(e.target.value)}
-                      placeholder="Enter a keyword..."
-                      className="flex-1 p-3 bg-black/50 border border-white/10 text-white rounded-lg focus:border-[#00B7EB]/50 focus:ring-2 focus:ring-[#00B7EB]/20 transition-all duration-300"
-                    />
-                    <button
-                      onClick={() => generateAIQuote(aiPrompt)}
-                      disabled={isLoading}
-                      className={isLoading ? "px-4 py-3 bg-white/10 text-white rounded-lg font-medium flex items-center gap-2 hover:bg-white/20 transition-all duration-300 disabled:opacity-50" : "px-4 py-3 bg-[#00B7EB] text-white rounded-lg font-medium flex items-center gap-2 hover:bg-[#00B7EB]/90 transition-all duration-300 disabled:opacity-50"}
-                    >
-                      {isLoading ? <AiOutlineLoading3Quarters size={16} className="animate-spin" /> : <IoSend size={16} />}
-                    </button>
-                  </div>
-                  <div className="flex flex-wrap gap-2">
-                    {Object.keys(quoteDatabase).map((category) => (
-                      <button
-                        key={category}
-                        onClick={() => {
-                          setAiPrompt(category);
-                          generateAIQuote(category);
-                        }}
-                        className="px-3 py-1 bg-black/50 border border-white/10 text-white text-sm rounded-full hover:border-[#00B7EB]/30 hover:bg-[#00B7EB]/10 transition-all duration-300 capitalize"
-                      >
-                        {category}
-                      </button>
-                    ))}
-                  </div>
-                  {aiResponse && (
-                    <div className="p-4 bg-black/50 rounded-lg border border-[#00B7EB]/20">
-                      <p className="text-base text-white italic">"{aiResponse}"</p>
-                    </div>
-                  )}
-                </div>
-              </div>
-            </div>
-
-            {/* Create Quote Form */}
-            <div className="lg:col-span-2">
-              <form
-                onSubmit={handleSubmit}
-                className="bg-black/50 backdrop-blur-md rounded-lg p-6 border border-[#00B7EB]/30  transition-colors duration-300"
-                style={{ animation: "fadeIn 0.6s ease-in-out 0.2s forwards" }}
-              >
-                <h2 className="text-3xl font-bold text-white mb-10">Craft Your Quote</h2>
-                <div className="space-y-4">
-                  <textarea
-                    value={newQuote}
-                    onChange={(e) => setNewQuote(e.target.value)}
-                    placeholder="Write your quote..."
-                    className="w-full p-4 bg-black/50 border border-white/10 text-white rounded-lg focus:border-[#00B7EB]/50 focus:ring-2 focus:ring-[#00B7EB]/20 transition-all duration-300 resize-none"
-                    rows="3"
-                    required
-                  />
+      <div className="max-w-6xl mx-auto px-4 mb-20">
+        <section className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+          {/* AI Quote Generator */}
+          <div className="lg:col-span-1">
+            <div className="bg-black/70 backdrop-blur-md rounded-lg p-6 border border-blue-500/20 hover:border-blue-500/40 transition-all duration-300">
+              <h2 className="text-3xl font-bold text-white mb-10">AI Quote Generator</h2>
+              <div className="space-y-4">
+                <div className="flex gap-3">
                   <input
                     type="text"
-                    value={context}
-                    onChange={(e) => setContext(e.target.value)}
-                    placeholder="Add context (optional)"
-                    className="w-full p-4 bg-black/50 border border-white/10 text-white rounded-lg focus:border-[#00B7EB]/50 focus:ring-2 focus:ring-[#00B7EB]/20 transition-all duration-300"
+                    value={aiPrompt}
+                    onChange={(e) => setAiPrompt(e.target.value)}
+                    placeholder="Enter a keyword..."
+                    className="flex-1 p-3 bg-black/50 border border-blue-500/20 text-white rounded-lg focus:border-blue-400 focus:ring-2 focus:ring-blue-400/20 transition-all duration-300"
                   />
-                  <select
-                    value={type}
-                    onChange={(e) => setType(e.target.value)}
-                    className="w-full p-4 bg-black/50 border border-white/10 text-white rounded-lg focus:border-[#00B7EB]/50 focus:ring-2 focus:ring-[#00B7EB]/20 transition-all duration-300"
-                  >
-                    {Object.keys(quoteDatabase).map((category) => (
-                      <option key={category} value={category} className="bg-black">
-                        {category.charAt(0).toUpperCase() + category.slice(1)}
-                      </option>
-                    ))}
-                  </select>
                   <button
-                    type="submit"
-                    className="w-full py-3 bg-[#00B7EB] text-white cursor-pointer rounded-lg font-semibold flex items-center justify-center gap-2 hover:bg-[#00B7EB]/90 transition-all duration-300"
+                    onClick={() => generateAIQuote(aiPrompt)}
+                    disabled={isLoading}
+                    className="px-4 py-3 bg-blue-500 text-white rounded-lg font-medium flex items-center gap-2 hover:bg-blue-600 transition-all duration-300 disabled:opacity-50"
                   >
-                    <FaPen size={16} /> Post Quote
+                    {isLoading ? (
+                      <AiOutlineLoading3Quarters size={16} className="animate-spin" />
+                    ) : (
+                      <IoSend size={16} />
+                    )}
                   </button>
                 </div>
-              </form>
+                <div className="flex flex-wrap gap-2">
+                  {Object.keys(quoteDatabase).map((category) => (
+                    <button
+                      key={category}
+                      onClick={() => {
+                        setAiPrompt(category);
+                        generateAIQuote(category);
+                      }}
+                      className="px-3 py-1 bg-black/50 border border-blue-500/20 text-blue-200 text-sm rounded-full hover:bg-blue-500/30 hover:text-white transition-all duration-300 capitalize"
+                    >
+                      {category}
+                    </button>
+                  ))}
+                </div>
+                {aiResponse && (
+                  <div className="p-4 bg-black/50 rounded-lg border border-blue-500/30">
+                    <p className="text-base text-blue-100 italic">"{aiResponse}"</p>
+                  </div>
+                )}
+              </div>
             </div>
-          </section>
-        </div>
+          </div>
 
-        {/* Quotes Display with HeroParallax */}
-        <div className="relative w-full overflow-hidden">
-          <div className="absolute inset-0 bg-gradient-to-b from-black via-black/50 to-transparent z-10 pointer-events-none h-40"></div>
-          <HeroParallax products={heroQuotes} />
-          <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-black via-black/50 to-transparent z-10 pointer-events-none h-40"></div>
-        </div>
+          {/* Create Quote Form */}
+          <div className="lg:col-span-2">
+            <form
+              onSubmit={handleSubmit}
+              className="bg-black/70 backdrop-blur-md rounded-lg p-6 border border-blue-500/20 hover:border-blue-500/40 transition-all duration-300"
+            >
+              <h2 className="text-3xl font-bold text-white mb-10">Craft Your Quote</h2>
+              <div className="space-y-4">
+                <textarea
+                  value={newQuote}
+                  onChange={(e) => setNewQuote(e.target.value)}
+                  placeholder="Write your quote..."
+                  className="w-full p-4 bg-black/50 border border-blue-500/20 text-white rounded-lg focus:border-blue-400 focus:ring-2 focus:ring-blue-400/20 transition-all duration-300 resize-none"
+                  rows="3"
+                  required
+                />
+                <input
+                  type="text"
+                  value={context}
+                  onChange={(e) => setContext(e.target.value)}
+                  placeholder="Add context (optional)"
+                  className="w-full p-4 bg-black/50 border border-blue-500/20 text-white rounded-lg focus:border-blue-400 focus:ring-2 focus:ring-blue-400/20 transition-all duration-300"
+                />
+                <select
+                  value={type}
+                  onChange={(e) => setType(e.target.value)}
+                  className="w-full p-4 bg-black/50 border border-blue-500/20 text-white rounded-lg focus:border-blue-400 focus:ring-2 focus:ring-blue-400/20 transition-all duration-300"
+                >
+                  {Object.keys(quoteDatabase).map((category) => (
+                    <option key={category} value={category} className="bg-black">
+                      {category.charAt(0).toUpperCase() + category.slice(1)}
+                    </option>
+                  ))}
+                </select>
+                <button
+                  type="submit"
+                  className="w-full py-3 bg-blue-500 text-white rounded-lg font-semibold flex items-center justify-center gap-2 hover:bg-blue-600 transition-all duration-300"
+                >
+                  <FaPen size={16} /> Post Quote
+                </button>
+              </div>
+            </form>
+          </div>
+        </section>
+
+        {/* Quotes Display */}
+        <section className="mt-16">
+          <div className="flex justify-between items-center mb-8">
+            <h2 className="text-4xl mb-2 font-bold text-white">Your Quotes</h2>
+            <div className="flex gap-4">
+              <button
+                onClick={() => setShowFilters(!showFilters)}
+                className="flex items-center gap-2 px-4 py-2 bg-black/50 border border-blue-500/20 text-blue-200 rounded-lg hover:bg-blue-500/30 transition-all duration-300"
+              >
+                <FiFilter /> Filters
+              </button>
+            </div>
+          </div>
+
+          {showFilters && (
+            <div className="mb-8 p-4 bg-black/70 backdrop-blur-md rounded-lg border border-blue-500/20">
+              <div className="flex flex-wrap gap-4">
+                <select
+                  value={filterType}
+                  onChange={(e) => setFilterType(e.target.value)}
+                  className="p-2 bg-black/50 border border-blue-500/20 text-white rounded-lg"
+                >
+                  <option value="all">All Types</option>
+                  {Object.keys(quoteDatabase).map((category) => (
+                    <option key={category} value={category}>
+                      {category.charAt(0).toUpperCase() + category.slice(1)}
+                    </option>
+                  ))}
+                </select>
+                <select
+                  value={sortOrder}
+                  onChange={(e) => setSortOrder(e.target.value)}
+                  className="p-2 bg-black/50 border border-blue-500/20 text-white rounded-lg"
+                >
+                  <option value="newest">Newest First</option>
+                  <option value="oldest">Oldest First</option>
+                  <option value="mostLiked">Most Liked</option>
+                  <option value="alphabetical">Alphabetical</option>
+                </select>
+              </div>
+            </div>
+          )}
+
+          {filteredQuotes.length === 0 ? (
+            <div className="text-center py-12 text-blue-200/70">
+              <p className="text-xl">No quotes yet. Create your first quote above!</p>
+            </div>
+          ) : (
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+              {filteredQuotes.map((quote) => (
+                <div
+                  key={quote.id}
+                  className="bg-black/70 backdrop-blur-md rounded-lg p-6 border border-blue-500/20 hover:border-blue-500/40 transition-all duration-300"
+                  style={{ animation: "cardSlide 0.5s ease-in-out forwards" }}
+                >
+                  <p className="text-blue-100 font-semibold italic mb-4">"{quote.text}"</p>
+                  <p className="text-blue-200/70 font-semibold text-sm mb-4">
+                    - {quote.context || "Anonymous"}
+                  </p>
+                  <p className="text-blue-200/50 font-medium  text-xs mb-4">
+                    {new Date(quote.createdAt).toLocaleDateString()}
+                  </p>
+                  <div className="flex justify-between gap-5 items-center">
+                    <div className="flex gap-2">
+                      <button
+                        onClick={() => handleLike(quote.id)}
+                        className="flex items-center gap-1 text-blue-300 hover:text-blue-400 transition-colors duration-300"
+                      >
+                        <FaHeart /> {quote.likes}
+                      </button>
+                      <button
+                        onClick={() => handleShare(quote)}
+                        className="flex items-center gap-1 text-blue-300 hover:text-blue-400 transition-colors duration-300"
+                      >
+                        <FaShare /> {quote.shares}
+                      </button>
+                      <button
+                        onClick={() => handleCopy(quote.text)}
+                        className="text-blue-300 hover:text-blue-400 transition-colors duration-300"
+                      >
+                        <FaCopy />
+                      </button>
+                    </div>
+                    <button
+                      onClick={() => handleDelete(quote.id)}
+                      className="text-red-400 hover:text-red-500 transition-colors duration-300"
+                    >
+                      <FaTrash />
+                    </button>
+                  </div>
+                </div>
+              ))}
+            </div>
+          )}
+        </section>
+
+        {/* HeroParallax Section */}
+        {filteredQuotes.length > 0 && (
+          <section className="mt-20">
+            <HeroParallax
+              products={filteredQuotes.map((quote) => ({
+                title: quote.type.charAt(0).toUpperCase() + quote.type.slice(1),
+                link: "#",
+                thumbnail: (
+                  <div className="group relative h-full w-full overflow-hidden rounded-xl border border-blue-500/20 bg-black/70 backdrop-blur-md">
+                    <div className="absolute inset-0 bg-gradient-to-b from-blue-500/20 to-black/50 opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+                    <div className="relative h-full p-8 flex flex-col justify-between">
+                      <div className="text-2xl text-white font-medium mb-4">
+                        "{quote.text}"
+                      </div>
+                      <div className="text-blue-300 text-sm">
+                        - {quote.context || "Anonymous"}
+                      </div>
+                      <div className="absolute bottom-4 right-4 flex gap-2 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+                        <button
+                          onClick={() => handleLike(quote.id)}
+                          className="p-2 bg-blue-500/30 rounded-full hover:bg-blue-500/50"
+                        >
+                          <FaHeart className="text-white" />
+                        </button>
+                        <button
+                          onClick={() => handleShare(quote)}
+                          className="p-2 bg-blue-500/30 rounded-full hover:bg-blue-500/50"
+                        >
+                          <FaShare className="text-white" />
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+                ),
+              }))}
+            />
+          </section>
+        )}
       </div>
     </div>
   );

@@ -346,9 +346,8 @@ const Quotes = () => {
                                             : ''
                                     }`}
                                 >
-                                    <Lens zoomFactor={1.3} lensSize={250}>
                                         <div className="relative group cursor-pointer">
-                                            <div className="absolute -top-6 -left-6 text-8xl font-serif text-white/10 select-none transition-all duration-300 group-hover:text-[#00B7EB]/20">"</div>
+                                            <div className="absolute -py-[20px] -top-6 -left-6 text-8xl font-serif text-white/10 select-none transition-all duration-300 group-hover:text-[#00B7EB]/20">"</div>
                                             <div className="space-y-6 select-none">
                                                 <p className="text-2xl md:text-3xl text-white mb-4 pl-8 leading-relaxed font-serif italic tracking-wide group-hover:text-white/90">
                                                     {quote.text}
@@ -358,7 +357,6 @@ const Quotes = () => {
                                                 </p>
                                             </div>
                                         </div>
-                                    </Lens>
                                     
                                     <div className={`flex justify-between items-center mt-8 pt-6 border-t border-white/10 transition-opacity duration-300 ${
                                         selectedForImage === index ? 'opacity-100' : 'opacity-0'

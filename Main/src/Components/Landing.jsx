@@ -377,10 +377,10 @@ const Landing = () => {
       </main>
 
       {/* Parallax Quotes Section */}
-      <section className="relative overflow-hidden -mt-40 z-0">
+      {/* <section className="relative overflow-hidden -mt-40 z-0">
         <div className="absolute inset-0 bg-gradient-to-b from-black/0 via-black/50 to-black/100 pointer-events-none" />
         <HeroParallax quotes={sampleQuotes} />
-      </section>
+      </section> */}
 
       {/* Features Section */}
       <section className="relative z-10 max-w-7xl mx-auto py-16 px-6" role="region" aria-labelledby="features-heading">
