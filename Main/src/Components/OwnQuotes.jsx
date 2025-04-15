@@ -354,7 +354,7 @@ const OwnQuotes = () => {
         <div className="max-w-7xl mx-auto flex items-center justify-between">
           <NavLink
             to="/"
-            className="text-4xl font-bold text-white hover:text-white/80 transition-colors duration-300"
+            className="text-4xl font-bold text-white font-[playball] hover:text-white/80 transition-colors duration-300"
           >
             Quote Loom
           </NavLink>

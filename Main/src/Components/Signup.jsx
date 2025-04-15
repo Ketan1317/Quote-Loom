@@ -43,7 +43,7 @@ const Signup = () => {
     if (validateForm()) {
       setIsSubmitting(true);
       try {
-        const response = await fetch("http://localhost:8000/user/", {
+        const response = await fetch("http://localhost:8000/user/signup", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           credentials: "include",
