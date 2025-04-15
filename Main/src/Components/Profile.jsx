@@ -298,14 +298,7 @@ const Profile = () => {
   return (
     <div className="min-h-screen bg-black text-white font-['Poppins']">
       {/* Gemini Effect Background */}
-      <div className="fixed top-0 left-0 w-full h-screen pointer-events-none">
-        <GoogleGeminiEffect 
-          pathLengths={[0.2, 0.4, 0.6, 0.8, 1]}
-          title="Profile"
-          description="."
-          className="absolute top-0 left-0 w-full h-full"
-        />
-      </div>
+      
 
       {/* Navbar */}
       <nav className="sticky top-0 z-50 bg-black/90 backdrop-blur-md px-6 py-4 shadow-[0_2px_8px_rgba(0,183,235,0.1)]">

@@ -252,14 +252,7 @@ const Dashboard = () => {
       </nav>
 
       {/* Gemini Effect Background */}
-      <div className="fixed top-0 left-0 w-full h-screen pointer-events-none">
-        <GoogleGeminiEffect
-          pathLengths={scrollProgress}
-          title="Quote Loom"
-          description="Where words come alive"
-          className="absolute top-0 left-0 w-full h-full"
-        />
-      </div>
+      
 
       <main className="relative z-10 max-w-7xl mx-auto px-6 py-8">
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
