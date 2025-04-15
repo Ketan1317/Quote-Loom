@@ -4,6 +4,8 @@ import { FaImages, FaQuoteLeft, FaGamepad, FaRandom, FaLightbulb } from "react-i
 import { IoMdAdd } from "react-icons/io";
 import { CgProfile } from "react-icons/cg";
 import { ToastContainer, toast } from 'react-toastify';
+import { BackgroundBeamsWithCollision } from "../Ui/background-beams-with-collision";
+import SparklesCore from "../Ui/sparkles";
 
 const Game = () => {
   const [activeGame, setActiveGame] = useState("fill-blanks");
@@ -367,7 +369,7 @@ const Game = () => {
   };
 
   return (
-    <div className="min-h-screen bg-black text-white font-['Poppins']">
+    <div className="min-h-screen bg-black text-white font-['Poppins'] relative overflow-hidden flex flex-col">
       <ToastContainer />
       
       <nav className="sticky top-0 z-50 bg-black/90 backdrop-blur-md px-6 py-4 shadow-[0_2px_4px_rgba(0,183,235,0.1)]">
@@ -443,49 +445,80 @@ const Game = () => {
         </div>
       </nav>
 
-      <main className="max-w-7xl mx-auto px-6 py-8">
-        <div className="flex flex-col mt-6 gap-6 mb-8">
-          <h1 className="text-5xl font-extrabold text-[#00B7EB] text-center">Quote Quest</h1>
-          <div className="flex flex-col gap-4 items-center">
-            <div className="bg-[rgba(0,183,235,0.1)] text-[#00B7EB] px-4 py-2 rounded-2xl font-semibold">
-              Score: {score}
-            </div>
-            <div className="flex flex-wrap gap-4 justify-center">
-              {["fill-blanks", "quote-guessing", "quote-scramble", "quote-trivia"].map((game) => (
-                <button
-                  key={game}
-                  onClick={() => {
-                    setActiveGame(game);
-                    setCurrentQuestion(0);
-                    setShowResult(false);
-                    setUserAnswer("");
-                    if (game === "quote-scramble") {
-                      scrambleWords(gameData[game].questions[0].quote);
-                    }
-                  }}
-                  className={`px-4 py-2 rounded-lg text-xl font-bold transition-all duration-300 ${
-                    activeGame === game
-                      ? "text-white bg-gray-700"
-                      : "bg-black/50 border-2 border-[rgba(0,183,235,0.3)] text-white hover:bg-gray-700"
-                  }`}
-                >
-                  {game === "fill-blanks"
-                    ? "Fill in Blanks"
-                    : game === "quote-guessing"
-                    ? "Guess Author"
-                    :  game === "quote-scramble"
-                    ? "Quote Scramble"
-                    : "Quote Trivia"}
-                </button>
-              ))}
-            </div>
-          </div>
+      <div className="flex-1 relative">
+        {/* Background Effects Layer */}
+        <div className="absolute inset-0 w-full h-full">
+          <BackgroundBeamsWithCollision />
         </div>
 
-        <div className="bg-black/80 backdrop-blur-md rounded-xl p-8 border border-[rgba(0,183,235,0.2)] shadow-[0_0_15px_rgba(0,183,235,0.1)] animate-[slideIn_0.4s_ease-out]">
-          {renderGame()}
-        </div>
-      </main>
+        {/* Main Content Layer */}
+        <main className="relative z-10 flex items-center justify-center min-h-[calc(100vh-5rem)] py-12">
+          <div className="max-w-7xl mx-auto px-6 w-full">
+            <div className="flex flex-col gap-12">
+              {/* Header Section with Enhanced Sparkles */}
+              <div className="text-center space-y-8 relative">
+                <div className="absolute inset-0 -z-10">
+                  <SparklesCore
+                    id="tsparticles"
+                    background="transparent"
+                    minSize={1}
+                    maxSize={2}
+                    particleDensity={200}
+                    className="w-full h-full"
+                    particleColor="#00B7EB"
+                    speed={2}
+                  />
+                </div>
+                <h1 className="text-6xl font-extrabold bg-clip-text text-transparent bg-gradient-to-b from-[#00B7EB] to-[#00B7EB]/50 pb-2">
+                  Quote Quest
+                </h1>
+                <div className="inline-flex items-center bg-[rgba(0,183,235,0.1)] text-[#00B7EB] px-8 py-4 rounded-2xl font-semibold text-2xl backdrop-blur-sm border border-[#00B7EB]/20">
+                  Score: {score}
+                </div>
+              </div>
+
+              {/* Game Type Selection */}
+              <div className="flex flex-wrap gap-6 justify-center max-w-4xl mx-auto">
+                {["fill-blanks", "quote-guessing", "quote-scramble", "quote-trivia"].map((game) => (
+                  <button
+                    key={game}
+                    onClick={() => {
+                      setActiveGame(game);
+                      setCurrentQuestion(0);
+                      setShowResult(false);
+                      setUserAnswer("");
+                      if (game === "quote-scramble") {
+                        scrambleWords(gameData[game].questions[0].quote);
+                      }
+                    }}
+                    className={`px-8 py-4 rounded-xl text-xl font-bold transition-all duration-300 backdrop-blur-sm ${
+                      activeGame === game
+                        ? "text-white bg-[#00B7EB] shadow-[0_0_20px_rgba(0,183,235,0.3)] scale-105 border-2 border-[#00B7EB]"
+                        : "bg-black/40 border-2 border-[rgba(0,183,235,0.3)] text-white hover:bg-[#00B7EB]/10 hover:border-[#00B7EB] hover:scale-105"
+                    }`}
+                  >
+                    {game === "fill-blanks"
+                      ? "Fill in Blanks"
+                      : game === "quote-guessing"
+                      ? "Guess Author"
+                      : game === "quote-scramble"
+                      ? "Quote Scramble"
+                      : "Quote Trivia"}
+                  </button>
+                ))}
+              </div>
+
+              {/* Game Content */}
+              <div className="bg-black/60 backdrop-blur-md rounded-xl p-10 border-2 border-[rgba(0,183,235,0.2)] shadow-[0_0_30px_rgba(0,183,235,0.1)] animate-[slideIn_0.4s_ease-out] relative overflow-hidden">
+                <div className="absolute inset-0 bg-gradient-to-b from-[#00B7EB]/5 to-transparent opacity-50"></div>
+                <div className="relative z-10">
+                  {renderGame()}
+                </div>
+              </div>
+            </div>
+          </div>
+        </main>
+      </div>
     </div>
   );
 };

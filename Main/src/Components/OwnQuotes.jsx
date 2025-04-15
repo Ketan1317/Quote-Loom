@@ -10,6 +10,9 @@ import { IoMdAdd } from "react-icons/io";
 import { FaQuoteLeft } from "react-icons/fa";
 import { FaGamepad } from "react-icons/fa6";
 import { CgProfile } from "react-icons/cg";
+import ExpandableQuoteCard from "./ExpandableQuoteCard";
+import { HeroParallax } from "../Ui/hero-parallax";
+import { BackgroundBeamsWithCollision } from "../Ui/background-beams-with-collision";
 
 const OwnQuotes = () => {
   const [quotes, setQuotes] = useState(() => {
@@ -213,8 +216,97 @@ const OwnQuotes = () => {
     filterType === "all" ? true : quote.type === filterType
   );
 
+  const heroQuotes = filteredQuotes.map((quote, index) => ({
+    title: quote.type.charAt(0).toUpperCase() + quote.type.slice(1),
+    link: "#",
+    thumbnail: (
+      <div className="group relative h-full w-full overflow-hidden rounded-xl border border-white/10 bg-black/50 backdrop-blur-md">
+        <div className="absolute inset-0 bg-gradient-to-b from-blue-500/10 to-black/50 opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+        <div className="relative h-full p-8 flex flex-col justify-between">
+          <div className="text-2xl text-white font-medium mb-4">"{quote.text}"</div>
+          <div className="text-[#00B7EB] text-sm">- {quote.context || "Anonymous"}</div>
+          <div className="absolute bottom-4 right-4 flex gap-2 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+            <button onClick={() => handleLike(quote.id)} className="p-2 bg-white/10 rounded-full hover:bg-white/20">
+              <FaHeart className="text-white" />
+            </button>
+            <button onClick={() => handleShare(quote)} className="p-2 bg-white/10 rounded-full hover:bg-white/20">
+              <FaShare className="text-white" />
+            </button>
+          </div>
+        </div>
+      </div>
+    ),
+  }));
+
+  const products = [
+    {
+      title: "Your Quotes",
+      link: "#quotes",
+      thumbnail: (
+        <div className="bg-white/5 backdrop-blur-md rounded-lg p-6 border border-white/10">
+          <div className="space-y-6">
+            {filteredQuotes.slice(0, 3).map((quote) => (
+              <div key={quote.id} className="p-4 bg-black/50 rounded-lg border border-white/10">
+                <p className="text-white italic">"{quote.text}"</p>
+                <p className="text-white/60 text-sm mt-2">- {quote.context || "Anonymous"}</p>
+              </div>
+            ))}
+          </div>
+        </div>
+      ),
+    },
+    {
+      title: "AI Generator",
+      link: "#ai",
+      thumbnail: (
+        <div className="bg-white/5 backdrop-blur-md rounded-lg p-6 border border-white/10">
+          <h3 className="text-white text-xl font-bold mb-4">Generate Quotes</h3>
+          <div className="space-y-4">
+            <input
+              type="text"
+              value={aiPrompt}
+              onChange={(e) => setAiPrompt(e.target.value)}
+              placeholder="Enter a keyword..."
+              className="w-full p-3 bg-black/50 border border-white/10 text-white rounded-lg focus:border-white/20 focus:ring-2 focus:ring-white/10"
+            />
+            <button
+              onClick={() => generateAIQuote(aiPrompt)}
+              className="w-full py-2 bg-white text-black rounded-lg font-medium hover:bg-white/90 transition-all"
+            >
+              Generate
+            </button>
+          </div>
+        </div>
+      ),
+    },
+    {
+      title: "Create Quote",
+      link: "#create",
+      thumbnail: (
+        <div className="bg-white/5 backdrop-blur-md rounded-lg p-6 border border-white/10">
+          <h3 className="text-white text-xl font-bold mb-4">Create New Quote</h3>
+          <div className="space-y-4">
+            <textarea
+              value={newQuote}
+              onChange={(e) => setNewQuote(e.target.value)}
+              placeholder="Write your quote..."
+              className="w-full p-3 bg-black/50 border border-white/10 text-white rounded-lg focus:border-white/20 focus:ring-2 focus:ring-white/10"
+              rows="3"
+            />
+            <button
+              onClick={handleSubmit}
+              className="w-full py-2 bg-white text-black rounded-lg font-medium hover:bg-white/90 transition-all"
+            >
+              Post Quote
+            </button>
+          </div>
+        </div>
+      ),
+    },
+  ];
+
   return (
-    <div className="min-h-screen bg-black text-white font-['Poppins']">
+    <div className="min-h-screen bg-black text-white">
       <style>
         {`
           @keyframes slideDown {
@@ -236,21 +328,20 @@ const OwnQuotes = () => {
         `}
       </style>
 
-      {/* Notification */}
       {showNotification && (
         <div className="fixed top-20 left-1/2 transform -translate-x-1/2 z-50 max-w-lg w-full px-4">
           <div
-            className="bg-black/90 backdrop-blur-md border border-[#00B7EB]/30 rounded-lg p-4 shadow-[0_0_10px_rgba(0,183,235,0.2)]"
+            className="bg-black/90 backdrop-blur-md border border-white/30 rounded-lg p-4 shadow-[0_0_10px_rgba(255,255,255,0.2)]"
             style={{ animation: "slideDown 0.5s ease-in-out forwards" }}
           >
             <div className="flex items-center justify-between">
               <div>
                 <p className="text-white text-base font-medium">"{notificationQuote}"</p>
-                <p className="text-[#00B7EB] text-sm">Quote posted successfully!</p>
+                <p className="text-white text-sm">Quote posted successfully!</p>
               </div>
               <button
                 onClick={() => setShowNotification(false)}
-                className="text-gray-400 hover:text-[#00B7EB] transition-colors duration-300"
+                className="text-gray-400 hover:text-white transition-colors duration-300"
               >
                 <FaTimes size={18} />
               </button>
@@ -259,12 +350,11 @@ const OwnQuotes = () => {
         </div>
       )}
 
-      {/* Navbar */}
-      <nav className="sticky top-0 z-50 bg-black/90 backdrop-blur-md px-6 py-4 shadow-[0_2px_4px_rgba(0,183,235,0.1)]">
+      <nav className="sticky top-0 z-50 bg-black/90 backdrop-blur-md px-6 py-4 shadow-[0_2px_4px_rgba(255,255,255,0.1)]">
         <div className="max-w-7xl mx-auto flex items-center justify-between">
           <NavLink
             to="/"
-            className="text-2xl font-semibold text-white hover:text-[#00B7EB] transition-colors duration-300"
+            className="text-4xl font-bold text-white hover:text-white/80 transition-colors duration-300"
           >
             Quote Loom
           </NavLink>
@@ -273,7 +363,8 @@ const OwnQuotes = () => {
               <NavLink
                 to="/dashboard"
                 className={({ isActive }) =>
-                  `text-xl font-semibold flex items-center gap-2 transition-colors duration-300 ${isActive ? "text-[#00B7EB] border-b-2 border-[#00B7EB]" : "text-white hover:text-[#00B7EB]"
+                  `text-xl font-semibold flex items-center gap-2 transition-colors duration-300 ${
+                    isActive ? "text-white border-b-2 border-white" : "text-white/80 hover:text-white"
                   }`
                 }
               >
@@ -284,7 +375,8 @@ const OwnQuotes = () => {
               <NavLink
                 to="/quotes"
                 className={({ isActive }) =>
-                  `text-xl font-semibold flex items-center gap-2 transition-colors duration-300 ${isActive ? "text-[#00B7EB] border-b-2 border-[#00B7EB]" : "text-white hover:text-[#00B7EB]"
+                  `text-xl font-semibold flex items-center gap-2 transition-colors duration-300 ${
+                    isActive ? "text-white border-b-2 border-white" : "text-white/80 hover:text-white"
                   }`
                 }
               >
@@ -295,7 +387,8 @@ const OwnQuotes = () => {
               <NavLink
                 to="/own-quotes"
                 className={({ isActive }) =>
-                  `text-xl font-semibold transition-colors flex items-center gap-2 duration-300 ${isActive ? "text-[#00B7EB] border-b-2 border-[#00B7EB]" : "text-white hover:text-[#00B7EB]"
+                  `text-xl font-semibold transition-colors flex items-center gap-2 duration-300 ${
+                    isActive ? "text-white border-b-2 border-white" : "text-white/80 hover:text-white"
                   }`
                 }
               >
@@ -306,7 +399,8 @@ const OwnQuotes = () => {
               <NavLink
                 to="/game"
                 className={({ isActive }) =>
-                  `text-xl font-semibold flex items-center gap-2 transition-colors duration-300 ${isActive ? "text-[#00B7EB] border-b-2 border-[#00B7EB]" : "text-white hover:text-[#00B7EB]"
+                  `text-xl font-semibold flex items-center gap-2 transition-colors duration-300 ${
+                    isActive ? "text-white border-b-2 border-white" : "text-white/80 hover:text-white"
                   }`
                 }
               >
@@ -317,7 +411,8 @@ const OwnQuotes = () => {
               <NavLink
                 to="/profile"
                 className={({ isActive }) =>
-                  `text-xl font-semibold flex items-center gap-2 transition-colors duration-300 ${isActive ? "text-[#00B7EB] border-b-2 border-[#00B7EB]" : "text-white hover:text-[#00B7EB]"
+                  `text-xl font-semibold flex items-center gap-2 transition-colors duration-300 ${
+                    isActive ? "text-white border-b-2 border-white" : "text-white/80 hover:text-white"
                   }`
                 }
               >
@@ -328,229 +423,118 @@ const OwnQuotes = () => {
         </div>
       </nav>
 
-      <main className="max-w-6xl mx-auto px-4 py-12">
-        <section className="grid grid-cols-1 lg:grid-cols-3 gap-8 mb-12">
-          {/* AI Quote Generator */}
-          <div className="lg:col-span-1">
-            <div
-              className="bg-black/80 backdrop-blur-md rounded-lg p-6 border border-[#00B7EB]/30"
-              style={{ animation: "fadeIn 0.6s ease-in-out forwards" }}
-            >
-              <h2 className="text-2xl font-bold italic mb text-white mb-10">AI Quote Generator</h2>
-              <div className="space-y-4">
-                <div className="flex gap-3">
+      <div className="relative">
+        <div className="text-center py-12 bg-gradient-to-b from-black to-black/95">
+          <h1 className="text-6xl flex items-center justify-center gap-4 font-bold text-white mb-4">
+            <IoMdAdd className="text-[#00B7EB]" />
+            <span>Create</span>
+          </h1>
+          <p className="text-xl text-white/80">Share your thoughts with the world</p>
+        </div>
+
+        <div className="max-w-6xl mx-auto px-4 mb-20">
+          <section className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+            {/* AI Quote Generator */}
+            <div className="lg:col-span-1">
+              <div
+                className="bg-black/50 backdrop-blur-md rounded-lg p-6 border border-white/10 hover:border-[#00B7EB]/30 transition-colors duration-300"
+                style={{ animation: "fadeIn 0.6s ease-in-out forwards" }}
+              >
+                <h2 className="text-3xl font-bold text-white mb-10">AI Quote Generator</h2>
+                <div className="space-y-4">
+                  <div className="flex gap-3">
+                    <input
+                      type="text"
+                      value={aiPrompt}
+                      onChange={(e) => setAiPrompt(e.target.value)}
+                      placeholder="Enter a keyword..."
+                      className="flex-1 p-3 bg-black/50 border border-white/10 text-white rounded-lg focus:border-[#00B7EB]/50 focus:ring-2 focus:ring-[#00B7EB]/20 transition-all duration-300"
+                    />
+                    <button
+                      onClick={() => generateAIQuote(aiPrompt)}
+                      disabled={isLoading}
+                      className={isLoading ? "px-4 py-3 bg-white/10 text-white rounded-lg font-medium flex items-center gap-2 hover:bg-white/20 transition-all duration-300 disabled:opacity-50" : "px-4 py-3 bg-[#00B7EB] text-white rounded-lg font-medium flex items-center gap-2 hover:bg-[#00B7EB]/90 transition-all duration-300 disabled:opacity-50"}
+                    >
+                      {isLoading ? <AiOutlineLoading3Quarters size={16} className="animate-spin" /> : <IoSend size={16} />}
+                    </button>
+                  </div>
+                  <div className="flex flex-wrap gap-2">
+                    {Object.keys(quoteDatabase).map((category) => (
+                      <button
+                        key={category}
+                        onClick={() => {
+                          setAiPrompt(category);
+                          generateAIQuote(category);
+                        }}
+                        className="px-3 py-1 bg-black/50 border border-white/10 text-white text-sm rounded-full hover:border-[#00B7EB]/30 hover:bg-[#00B7EB]/10 transition-all duration-300 capitalize"
+                      >
+                        {category}
+                      </button>
+                    ))}
+                  </div>
+                  {aiResponse && (
+                    <div className="p-4 bg-black/50 rounded-lg border border-[#00B7EB]/20">
+                      <p className="text-base text-white italic">"{aiResponse}"</p>
+                    </div>
+                  )}
+                </div>
+              </div>
+            </div>
+
+            {/* Create Quote Form */}
+            <div className="lg:col-span-2">
+              <form
+                onSubmit={handleSubmit}
+                className="bg-black/50 backdrop-blur-md rounded-lg p-6 border border-[#00B7EB]/30  transition-colors duration-300"
+                style={{ animation: "fadeIn 0.6s ease-in-out 0.2s forwards" }}
+              >
+                <h2 className="text-3xl font-bold text-white mb-10">Craft Your Quote</h2>
+                <div className="space-y-4">
+                  <textarea
+                    value={newQuote}
+                    onChange={(e) => setNewQuote(e.target.value)}
+                    placeholder="Write your quote..."
+                    className="w-full p-4 bg-black/50 border border-white/10 text-white rounded-lg focus:border-[#00B7EB]/50 focus:ring-2 focus:ring-[#00B7EB]/20 transition-all duration-300 resize-none"
+                    rows="3"
+                    required
+                  />
                   <input
                     type="text"
-                    value={aiPrompt}
-                    onChange={(e) => setAiPrompt(e.target.value)}
-                    placeholder="Enter a keyword..."
-                    className="flex-1 p-3 bg-black/50 border-2 border-[#00B7EB]/30 text-white rounded-lg focus:border-[#00B7EB]/40 focus:ring-2 focus:ring-[#00B7EB]/50 transition-all duration-300"
+                    value={context}
+                    onChange={(e) => setContext(e.target.value)}
+                    placeholder="Add context (optional)"
+                    className="w-full p-4 bg-black/50 border border-white/10 text-white rounded-lg focus:border-[#00B7EB]/50 focus:ring-2 focus:ring-[#00B7EB]/20 transition-all duration-300"
                   />
-                  <button
-                    onClick={() => generateAIQuote(aiPrompt)}
-                    disabled={isLoading}
-                    className={isLoading ? "px-4 py-3 bg-gray-700  text-black rounded-lg font-medium flex items-center gap-2 hover:bg-[#00A3D6] transition-all duration-300 disabled:opacity-50" : "px-4 py-3 bg-[#00B7EB]  text-black rounded-lg font-medium flex items-center gap-2 hover:bg-[#00A3D6] transition-all duration-300 disabled:opacity-50"}
+                  <select
+                    value={type}
+                    onChange={(e) => setType(e.target.value)}
+                    className="w-full p-4 bg-black/50 border border-white/10 text-white rounded-lg focus:border-[#00B7EB]/50 focus:ring-2 focus:ring-[#00B7EB]/20 transition-all duration-300"
                   >
-                    {isLoading ? <AiOutlineLoading3Quarters size={16} className="animate-spin " /> : <IoSend size={16} />}
+                    {Object.keys(quoteDatabase).map((category) => (
+                      <option key={category} value={category} className="bg-black">
+                        {category.charAt(0).toUpperCase() + category.slice(1)}
+                      </option>
+                    ))}
+                  </select>
+                  <button
+                    type="submit"
+                    className="w-full py-3 bg-[#00B7EB] text-white cursor-pointer rounded-lg font-semibold flex items-center justify-center gap-2 hover:bg-[#00B7EB]/90 transition-all duration-300"
+                  >
+                    <FaPen size={16} /> Post Quote
                   </button>
                 </div>
-                <div className="flex flex-wrap gap-2">
-                  {Object.keys(quoteDatabase).map((category) => (
-                    <button
-                      key={category}
-                      onClick={() => {
-                        setAiPrompt(category);
-                        generateAIQuote(category);
-                      }}
-                      className="px-3 py-1 bg-black/50 border border-[#00B7EB]/70 text-white text-sm rounded-full hover:bg-gray-800 hover:border-none transition-all duration-300 capitalize"
-                    >
-                      {category}
-                    </button>
-                  ))}
-                </div>
-                {aiResponse && (
-                  <div className="p-4 bg-black/60 rounded-lg border-2 border-[#00B7EB]/20">
-                    <p className="text-base text-white italic">"{aiResponse}"</p>
-                  </div>
-                )}
-              </div>
+              </form>
             </div>
-          </div>
+          </section>
+        </div>
 
-          {/* Create Quote Form */}
-          <div className="lg:col-span-2">
-            <form
-              onSubmit={handleSubmit}
-              className="bg-black/80 backdrop-blur-md rounded-lg p-6 border border-[#00B7EB]"
-              style={{ animation: "fadeIn 0.6s ease-in-out 0.2s forwards" }}
-            >
-              <h2 className="text-2xl italic font-bold text-white mb-10">Craft Your Quote</h2>
-              <div className="space-y-4">
-                <textarea
-                  value={newQuote}
-                  onChange={(e) => setNewQuote(e.target.value)}
-                  placeholder="Write your quote..."
-                  className="w-full p-4 bg-black/50 border border-[#00B7EB]/30 text-white rounded-lg focus:border-[#00B7EB] focus:ring-2 focus:ring-[#00B7EB]/50 transition-all duration-300 resize-none"
-                  rows="3"
-                  required
-                />
-                <input
-                  type="text"
-                  value={context}
-                  onChange={(e) => setContext(e.target.value)}
-                  placeholder="Add context (optional)"
-                  className="w-full p-4 bg-black/50 border border-[#00B7EB]/30 text-white rounded-lg focus:border-[#00B7EB] focus:ring-2 focus:ring-[#00B7EB]/50 transition-all duration-300"
-                />
-                <select
-                  value={type}
-                  onChange={(e) => setType(e.target.value)}
-                  className="w-full p-4 bg-black/50 border border-[#00B7EB]/30 text-white rounded-lg focus:border-[#00B7EB] focus:ring-2 focus:ring-[#00B7EB]/50 transition-all duration-300"
-                >
-                  {Object.keys(quoteDatabase).map((category) => (
-                    <option key={category} value={category} className="bg-black">
-                      {category.charAt(0).toUpperCase() + category.slice(1)}
-                    </option>
-                  ))}
-                </select>
-                <button
-                  type="submit"
-                  className="w-full py-3 bg-[#00B7EB] text-black cursor-pointer rounded-lg font-semibold flex items-center justify-center gap-2 hover:bg-gray-600 transition-all duration-300"
-                >
-                  <FaPen size={16} /> Post Quote
-                </button>
-              </div>
-            </form>
-          </div>
-        </section>
-
-        {/* Quotes List */}
-        <section className="bg-black/80 backdrop-blur-md rounded-lg p-6 border border-[#00B7EB]/30">
-          <div className="flex items-center justify-between mb-6">
-            <h2 className="text-2xl font-bold text-[#00B7EB]">Your Quotes</h2>
-            <div className="flex items-center gap-3">
-              <button
-                onClick={() => setShowFilters(!showFilters)}
-                className="p-2 bg-black/50 border border-[#00B7EB]/30 text-white rounded-lg hover:bg-[#00B7EB] hover:text-black transition-all duration-300"
-                aria-label="Toggle filters"
-              >
-                <FiFilter size={18} />
-              </button>
-              <button
-                onClick={() =>
-                  setSortOrder((prev) =>
-                    prev === "alphabetical" ? "newest" : "alphabetical"
-                  )
-                }
-                className="p-2 bg-black/50 border border-[#00B7EB]/30 text-white rounded-lg hover:bg-[#00B7EB] hover:text-black transition-all duration-300"
-                aria-label="Toggle sort order"
-              >
-                {sortOrder === "alphabetical" ? (
-                  <BsSortAlphaDown size={18} />
-                ) : (
-                  <BsSortAlphaUp size={18} />
-                )}
-              </button>
-            </div>
-          </div>
-
-          {/* Filters */}
-          <div
-            className={`flex flex-wrap gap-2 mb-6 transition-all duration-300 ${showFilters ? "opacity-100 max-h-96" : "opacity-0 max-h-0 overflow-hidden"
-              }`}
-          >
-            <button
-              onClick={() => setFilterType("all")}
-              className={`px-4 py-2 rounded-lg text-sm font-medium transition-all duration-300 ${filterType === "all"
-                  ? "bg-[#00B7EB] text-black"
-                  : "bg-black/50 border border-[#00B7EB]/30 text-white hover:bg-[#00B7EB] hover:text-black"
-                }`}
-            >
-              All
-            </button>
-            {Object.keys(quoteDatabase).map((category) => (
-              <button
-                key={category}
-                onClick={() => setFilterType(category)}
-                className={`px-4 py-2 rounded-lg text-sm font-medium capitalize transition-all duration-300 ${filterType === category
-                    ? "bg-[#00B7EB] text-black"
-                    : "bg-black/50 border border-[#00B7EB]/30 text-white hover:bg-[#00B7EB] hover:text-black"
-                  }`}
-              >
-                {category}
-              </button>
-            ))}
-          </div>
-
-          {/* Quotes */}
-          <div className="space-y-6">
-            {filteredQuotes.length ? (
-              filteredQuotes.map((quote) => (
-                <article
-                  key={quote.id}
-                  className="bg-black/60 backdrop-blur-md rounded-lg p-6 border border-[#00B7EB]/20 transition-all duration-300 hover:border-[#00B7EB]/40 hover:shadow-[0_0_10px_rgba(0,183,235,0.2)]"
-                  style={{
-                    animation: `cardSlide 0.6s ease-in-out ${quote.id % 10 * 0.1}s forwards`,
-                    opacity: 0,
-                  }}
-                >
-                  <div className="relative">
-                    <span className="absolute -top-2 -left-2 text-[#00B7EB]/20 text-4xl">“</span>
-                    <p className="text-lg text-white font-medium italic mb-2 pl-6">"{quote.text}"</p>
-                    {quote.context && (
-                      <p className="text-sm text-gray-400 italic pl-6 mb-4">"{quote.context}"</p>
-                    )}
-                  </div>
-                  <div className="flex items-center justify-between border-t border-[#00B7EB]/10 pt-4">
-                    <div className="flex items-center gap-4">
-                      <span className="px-3 py-1 bg-[#00B7EB]/10 text-[#00B7EB] text-xs font-medium rounded-full capitalize">
-                        {quote.type}
-                      </span>
-                      <span className="text-gray-400 text-xs flex items-center gap-1">
-                        <FiCalendar size={12} />
-                        {new Date(quote.createdAt).toLocaleDateString()}
-                      </span>
-                    </div>
-                    <div className="flex items-center gap-4">
-                      <button
-                        onClick={() => handleLike(quote.id)}
-                        className={`flex items-center gap-1 text-sm transition-all duration-300 ${quote.likes > 0 ? "text-[#00B7EB]" : "text-gray-400"
-                          } hover:text-[#00B7EB]`}
-                        aria-label="Like quote"
-                      >
-                        <FaHeart size={14} className={quote.likes > 0 ? "animate-pulse" : ""} />
-                        <span>{quote.likes}</span>
-                      </button>
-                      <button
-                        onClick={() => handleShare(quote)}
-                        className="text-gray-400 hover:text-[#00B7EB] transition-colors duration-300"
-                        aria-label="Share quote"
-                      >
-                        <FaShare size={14} />
-                      </button>
-                      <button
-                        onClick={() => handleCopy(quote.text)}
-                        className="text-gray-400 hover:text-[#00B7EB] transition-colors duration-300"
-                        aria-label="Copy quote"
-                      >
-                        <FaCopy size={14} />
-                      </button>
-                      <button
-                        onClick={() => handleDelete(quote.id)}
-                        className="text-gray-400 hover:text-red-500 transition-colors duration-300"
-                        aria-label="Delete quote"
-                      >
-                        <FaTrash size={14} />
-                      </button>
-                    </div>
-                  </div>
-                </article>
-              ))
-            ) : (
-              <p className="text-center text-gray-400 italic">No quotes yet. Create your first one!</p>
-            )}
-          </div>
-        </section>
-      </main>
+        {/* Quotes Display with HeroParallax */}
+        <div className="relative w-full overflow-hidden">
+          <div className="absolute inset-0 bg-gradient-to-b from-black via-black/50 to-transparent z-10 pointer-events-none h-40"></div>
+          <HeroParallax products={heroQuotes} />
+          <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-black via-black/50 to-transparent z-10 pointer-events-none h-40"></div>
+        </div>
+      </div>
     </div>
   );
 };

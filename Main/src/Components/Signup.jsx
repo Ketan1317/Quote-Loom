@@ -4,6 +4,7 @@ import { GoSignIn } from "react-icons/go";
 import { FaRegUser, FaLock, FaBars, FaTimes } from "react-icons/fa";
 import { MdEmail } from "react-icons/md";
 import { AiFillEye, AiFillEyeInvisible } from "react-icons/ai";
+import { BackgroundBeamsWithCollision } from "../Ui/background-beams-with-collision";
 
 const Signup = () => {
   const navigate = useNavigate();
@@ -18,6 +19,7 @@ const Signup = () => {
   const [errors, setErrors] = useState({});
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [error, setError] = useState("");
 
   // Validate form data
   const validateForm = () => {
@@ -36,14 +38,31 @@ const Signup = () => {
     return Object.keys(newErrors).length === 0;
   };
 
-  const handleSignupSubmit = (e) => {
+  const handleSignupSubmit = async (e) => {
     e.preventDefault();
     if (validateForm()) {
       setIsSubmitting(true);
-      setTimeout(() => {
-        console.log("Signup data:", signupData);
-        navigate("/main");
-      }, 1000); // Delay for animation
+      try {
+        const response = await fetch("http://localhost:8000/user/", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          credentials: "include",
+          body: JSON.stringify(signupData),
+        });
+
+        const data = await response.json();
+        if (response.ok) {
+          localStorage.setItem("user", JSON.stringify(data.user));
+          navigate("/dashboard");
+        } else {
+          setError(data.error || "Signup failed");
+        }
+      } catch (err) {
+        console.error("Signup error:", err);
+        setError("Failed to connect to the server.");
+      } finally {
+        setIsSubmitting(false);
+      }
     }
   };
 
@@ -99,7 +118,7 @@ const Signup = () => {
       </nav>
 
       {/* Main Section */}
-      <main className="min-h-screen flex items-center justify-center py-15 px-4 relative">
+      <BackgroundBeamsWithCollision className="min-h-screen flex items-center justify-center py-15 px-4 relative">
         <div className="w-full max-w-md bg-black/80 backdrop-blur-md rounded-xl p-8 border border-[#00B7EB]/30">
           <form onSubmit={handleSignupSubmit} className="space-y-6">
             <div className="text-center text-3xl font-bold text-white mb-8">
@@ -235,7 +254,7 @@ const Signup = () => {
             </div>
           </form>
         </div>
-      </main>
+      </BackgroundBeamsWithCollision>
     </div>
   );
 };

@@ -18,6 +18,10 @@ import {
   FaInstagram,
 } from "react-icons/fa6";
 import { Link } from "react-router-dom";
+import FloatingDock from "../Ui/FloatingDock";
+import { HeroParallax } from "../Ui/hero-parallax";
+import { motion } from "framer-motion";
+import { TextGenerateEffect } from "../Ui/text-generate";
 
 const Landing = () => {
   const [isCopied, setIsCopied] = useState(false);
@@ -62,6 +66,84 @@ const Landing = () => {
       title: "Gamified Fun",
       description: "Earn likes, collect badges, and make your quote journey more rewarding.",
     },
+  ];
+
+  const sampleQuotes = [
+    {
+      id: 1,
+      text: "The only way to do great work is to love what you do.",
+      author: "Steve Jobs"
+    },
+    {
+      id: 2,
+      text: "Innovation distinguishes between a leader and a follower.",
+      author: "Steve Jobs"
+    },
+    {
+      id: 3,
+      text: "Your time is limited, don't waste it living someone else's life.",
+      author: "Steve Jobs"
+    },
+    {
+      id: 4,
+      text: "Stay hungry, stay foolish.",
+      author: "Steve Jobs"
+    },
+    {
+      id: 5,
+      text: "Design is not just what it looks like and feels like. Design is how it works.",
+      author: "Steve Jobs"
+    },
+    {
+      id: 6,
+      text: "The people who are crazy enough to think they can change the world are the ones who do.",
+      author: "Steve Jobs"
+    },
+    {
+      id: 7,
+      text: "Quality is more important than quantity. One home run is much better than two doubles.",
+      author: "Steve Jobs"
+    },
+    {
+      id: 8,
+      text: "Be a yardstick of quality. Some people aren't used to an environment where excellence is expected.",
+      author: "Steve Jobs"
+    },
+    {
+      id: 9,
+      text: "I'm convinced that about half of what separates the successful entrepreneurs from the non-successful ones is pure perseverance.",
+      author: "Steve Jobs"
+    },
+    {
+      id: 10,
+      text: "Sometimes when you innovate, you make mistakes. It is best to admit them quickly, and get on with improving your other innovations.",
+      author: "Steve Jobs"
+    },
+    {
+      id: 11,
+      text: "My favorite things in life don't cost any money. It's really clear that the most precious resource we all have is time.",
+      author: "Steve Jobs"
+    },
+    {
+      id: 12,
+      text: "I think if you do something and it turns out pretty good, then you should go do something else wonderful, not dwell on it for too long. Just figure out what's next.",
+      author: "Steve Jobs"
+    },
+    {
+      id: 13,
+      text: "Remembering that you are going to die is the best way I know to avoid the trap of thinking you have something to lose.",
+      author: "Steve Jobs"
+    },
+    {
+      id: 14,
+      text: "Have the courage to follow your heart and intuition. They somehow already know what you truly want to become.",
+      author: "Steve Jobs"
+    },
+    {
+      id: 15,
+      text: "The only way to do great work is to love what you do. If you haven't found it yet, keep looking. Don't settle.",
+      author: "Steve Jobs"
+    }
   ];
 
   useEffect(() => {
@@ -164,7 +246,7 @@ const Landing = () => {
       </nav>
 
       {/* Hero Section */}
-      <main className="max-w-7xl mx-auto py-16 px-6 text-center relative" role="main">
+      <main className="max-w-7xl mx-auto py-16 px-6 text-center relative z-10" role="main">
         <style>
           {`
             @keyframes float {
@@ -179,25 +261,21 @@ const Landing = () => {
               0% { opacity: 0; transform: translateY(20px); }
               100% { opacity: 1; transform: translateY(0); }
             }
-            @keyframes quoteSlide {
-              0% { opacity: 0; transform: translateY(10px); }
-              100% { opacity: 1; transform: translateY(0); }
-            }
-            @keyframes ctaSlide {
-              0% { opacity: 0; transform: translateY(20px); }
-              100% { opacity: 1; transform: translateY(0); }
+            @keyframes textGlow {
+              0%, 100% { text-shadow: 0 0 2px rgba(0, 183, 235, 0.3), 0 0 5px rgba(0, 183, 235, 0.2); }
+              50% { text-shadow: 0 0 5px rgba(0, 183, 235, 0.5), 0 0 10px rgba(0, 183, 235, 0.3); }
             }
           `}
         </style>
         <div className="absolute inset-0 z-[-1] overflow-hidden">
           {[
-            { Icon: FaGamepad, top: "10%", left: "10%", size: 36, delay: 0 },
-            { Icon: BsChatLeftQuoteFill, top: "25%", left: "85%", size: 32, delay: 1 },
-            { Icon: SiGameloft, top: "45%", left: "20%", size: 28, delay: 2 },
-            { Icon: TiSocialLastFm, top: "15%", left: "65%", size: 40, delay: 3 },
-            { Icon: SlSocialSkype, top: "60%", left: "35%", size: 34, delay: 4 },
-            { Icon: FaGamepad, top: "35%", left: "90%", size: 32, delay: 5 },
-            { Icon: BsChatLeftQuoteFill, top: "70%", left: "15%", size: 30, delay: 6 },
+            { Icon: FaGamepad, top: "10%", left: "10%", size: 56, delay: 0 },
+            { Icon: BsChatLeftQuoteFill, top: "25%", left: "85%", size: 42, delay: 1 },
+            { Icon: SiGameloft, top: "45%", left: "20%", size: 48, delay: 2 },
+            { Icon: TiSocialLastFm, top: "15%", left: "65%", size: 50, delay: 3 },
+            { Icon: SlSocialSkype, top: "60%", left: "35%", size: 44, delay: 4 },
+            { Icon: FaGamepad, top: "35%", left: "90%", size: 42, delay: 5 },
+            { Icon: BsChatLeftQuoteFill, top: "70%", left: "15%", size: 40, delay: 6 },
           ].map(({ Icon, top, left, size, delay }, index) => (
             <Icon
               key={index}
@@ -214,53 +292,27 @@ const Landing = () => {
             />
           ))}
         </div>
-        <div className="relative">
-  <style>
-    {`
-      @keyframes heroTitleSlide {
-        0% { opacity: 0; transform: translateY(20px); }
-        100% { opacity: 1; transform: translateY(0); }
-      }
-      @keyframes heroSubtitleSlide {
-        0% { opacity: 0; transform: translateY(20px); }
-        100% { opacity: 1; transform: translateY(0); }
-      }
-      @keyframes textGlow {
-        0%, 100% { text-shadow: 0 0 2px rgba(0, 183, 235, 0.3), 0 0 5px rgba(0, 183, 235, 0.2); }
-        50% { text-shadow: 0 0 5px rgba(0, 183, 235, 0.5), 0 0 10px rgba(0, 183, 235, 0.3); }
-      }
-    `}
-  </style>
-  <h1
-    className="text-4xl md:text-7xl mt-18 font-bold text-white mb-4"
-    // style={{
-    //   animation: "heroTitleSlide 0.6s ease-in-out forwards, textGlow 3s ease-in-out infinite",
-    //   background: "linear-gradient(to right, #FFFFFF, #E0F7FF)",
-    //   WebkitBackgroundClip: "text",
-    //   WebkitTextFillColor: "transparent",
-    // }}
-  >
-    Inspire...Create...Share.
-  </h1>
-  <p
-    className="text-md md:text-xl mt-6 text-white max-w-2xl mx-auto mb-8 relative"
-    style={{
-      animation: "heroSubtitleSlide 0.6s ease-in-out 0.2s forwards",
-      opacity: 0,
-      transition: "color 0.3s ease-in-out",
-    }}
-    onMouseEnter={(e) => (e.currentTarget.style.color = "#00B7EB")}
-    onMouseLeave={(e) => (e.currentTarget.style.color = "#FFFFFF")}
-  >
-    Discover, create, and share quotes that spark creativity and drive motivation.
-    <span
-      className="absolute bottom-0 left-0 w-0 h-0.5 bg-[#00B7EB] transition-all duration-300"
-      style={{ width: "0%" }}
-      onMouseEnter={(e) => (e.currentTarget.style.width = "100%")}
-      onMouseLeave={(e) => (e.currentTarget.style.width = "0%")}
-    />
-  </p>
-</div>
+        <div className="relative mb-16">
+          <motion.h1
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.6, ease: "easeInOut" }}
+            className="text-4xl md:text-7xl mt-18 font-bold text-white mb-4"
+            style={{
+              animation: "textGlow 3s ease-in-out infinite",
+              background: "linear-gradient(to right, #FFFFFF, #E0F7FF)",
+              WebkitBackgroundClip: "text",
+              WebkitTextFillColor: "transparent",
+            }}
+          >
+            Inspire...Create...Share.
+          </motion.h1>
+          <TextGenerateEffect
+            words="Discover, create, and share quotes that spark creativity and drive motivation."
+            className="text-center max-w-2xl mx-auto"
+            duration={0.8}
+          />
+        </div>
         <div
           className="bg-black/80 backdrop-blur-md rounded-lg p-6 mb-8 border border-[#00B7EB]/30 max-w-3xl mx-auto relative"
           style={{ animation: "quoteSlide 0.6s ease-in-out 0.4s forwards", opacity: 0 }}
@@ -285,7 +337,7 @@ const Landing = () => {
             {currentText + 1} of {text.length}
           </div>
         </div>
-        <div className="flex justify-center space-x-4 mb-8">
+        <div className="flex justify-center -mt-44 space-x-4 mb-8">
           <button
             onClick={handleLike}
             className="p-3 bg-black/80 border border-[#00B7EB]/30 rounded-lg text-white transition-colors duration-300 hover:bg-[#00B7EB] hover:text-black"
@@ -308,19 +360,30 @@ const Landing = () => {
             <CiShare2 size={24} />
           </button>
         </div>
-        <div className="relative">
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.6, ease: "easeInOut", delay: 0.4 }}
+          className="flex justify-center -mt-32 mb-16"
+        >
           <Link
             to="/signup"
-            className="inline-block px-8 py-4 bg-gray-950 border border-[#00B7EB]/30 text-white rounded-lg font-semibold text-xl transition-colors duration-300 hover:bg-gray-900"
-            style={{ animation: "ctaSlide 0.6s ease-in-out 0.6s forwards", opacity: 0 }}
+            className="px-8 py-4 bg-gray-800 mt-44 text-white border-2 border-[#00B7EB]/40 rounded-lg font-semibold text-xl transition-all duration-300 hover:bg-gray-900 hover:scale-105 hover:shadow-lg hover:shadow-[#00B7EB]/20"
           >
             Start Your Journey
           </Link>
-        </div>
+        </motion.div>
+        
       </main>
 
+      {/* Parallax Quotes Section */}
+      <section className="relative overflow-hidden -mt-40 z-0">
+        <div className="absolute inset-0 bg-gradient-to-b from-black/0 via-black/50 to-black/100 pointer-events-none" />
+        <HeroParallax quotes={sampleQuotes} />
+      </section>
+
       {/* Features Section */}
-      <section className="max-w-7xl mx-auto py-16 px-6" role="region" aria-labelledby="features-heading">
+      <section className="relative z-10 max-w-7xl mx-auto py-16 px-6" role="region" aria-labelledby="features-heading">
         <style>
           {`
             @keyframes featureTitleSlide {
@@ -348,7 +411,7 @@ const Landing = () => {
           {features.map((item, index) => (
             <div
               key={index}
-              className="w-[90vw] min-h-[24vh] bg-black/80 backdrop-blur-md rounded-lg p-6 flex flex-row items-center border border-[#00B7EB]/30 transition-colors duration-300 hover:bg-black/90"
+              className="w-[90vw] min-h-[24vh] bg-black/80 backdrop-blur-md rounded-lg p-6 flex flex-row gap-12 items-center border border-[#00B7EB]/30 transition-colors duration-300 hover:bg-black/90"
               style={{
                 animation: `cardSlide 0.8s ease-in-out ${0.2 + index * 0.2}s forwards`,
                 opacity: 0,
@@ -362,15 +425,15 @@ const Landing = () => {
                   }}
                 >
                   {React.cloneElement(item.icon, {
-                    className: "text-5xl text-[#00B7EB]",
+                    className: "text-7xl text-[#00B7EB]/80",
                   })}
                 </div>
               </div>
               <div className="flex-1 flex flex-col justify-center">
-                <h3 className="text-xl font-semibold text-white mb-2">
+                <h3 className="text-3xl font-bold text-white mb-2">
                   {item.title}
                 </h3>
-                <p className="text-base text-white/80">
+                <p className="text-xl font-semibold text-white/80">
                   {item.description}
                 </p>
               </div>
@@ -380,7 +443,7 @@ const Landing = () => {
       </section>
 
       {/* Footer */}
-      <footer className="bg-black/90 backdrop-blur-md py-8 px-6 border-t border-[#00B7EB]/20">
+      <footer className="bg-black/90 backdrop-blur-md py-8 px-6 border-t border-[#00B7EB]/20 relative">
         <div className="max-w-7xl mx-auto flex flex-col items-center space-y-6">
           <div className="text-center space-y-2">
             <h2 className="text-2xl font-semibold text-white">

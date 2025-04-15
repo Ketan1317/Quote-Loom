@@ -11,6 +11,8 @@ import { IoMdAdd } from "react-icons/io";
 import { FaQuoteLeft } from "react-icons/fa";
 import { FaGamepad } from "react-icons/fa6";
 import { CgProfile } from "react-icons/cg";
+import { FollowerPointerCard } from "../Ui/following-pointer";
+import { GoogleGeminiEffect } from "../Ui/gemini-effect";
 
 const Dashboard = () => {
   const [quote, setQuote] = useState(null);
@@ -26,6 +28,7 @@ const Dashboard = () => {
   const [quoteHistory, setQuoteHistory] = useState([]);
   const [showShareOptions, setShowShareOptions] = useState(false);
   const [likedQuotes, setLikedQuotes] = useState(new Set());
+  const [scrollProgress, setScrollProgress] = useState([0, 0, 0, 0, 0]);
 
   const fetchNewQuote = async () => {
     try {
@@ -50,6 +53,28 @@ const Dashboard = () => {
 
   useEffect(() => {
     fetchNewQuote();
+  }, []);
+
+  useEffect(() => {
+    const handleScroll = () => {
+      const scrollY = window.scrollY;
+      const windowHeight = window.innerHeight;
+      const documentHeight = document.documentElement.scrollHeight;
+      const progress = scrollY / (documentHeight - windowHeight);
+      
+      setScrollProgress([
+        Math.min(progress * 1.5, 1),
+        Math.min(progress * 1.2, 1),
+        Math.min(progress * 0.9, 1),
+        Math.min(progress * 0.6, 1),
+        Math.min(progress * 0.3, 1),
+      ]);
+    };
+
+    window.addEventListener('scroll', handleScroll);
+    handleScroll(); // Initial calculation
+
+    return () => window.removeEventListener('scroll', handleScroll);
   }, []);
 
   const handleCopy = async () => {
@@ -196,126 +221,127 @@ const Dashboard = () => {
         </div>
       </nav>
 
-      <main className="max-w-7xl mx-auto px-6 py-8">
+      {/* Gemini Effect Background */}
+      <div className="fixed top-0 left-0 w-full h-screen pointer-events-none">
+        <GoogleGeminiEffect 
+          pathLengths={scrollProgress}
+          title="Quote Loom"
+          description="Where words come alive"
+          className="absolute top-0 left-0 w-full h-full"
+        />
+      </div>
+
+      <main className="relative z-10 max-w-7xl mx-auto px-6 py-8">
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
           {/* Main Quote Section */}
           <div className="lg:col-span-2 space-y-6">
             {/* Quote Card */}
-            <div className="bg-black/80 backdrop-blur-md p-8 rounded-xl border border-[#00B7EB]">
+            <div className="bg-black/80 backdrop-blur-md p-8 rounded-xl border border-white/10 shadow-[0_0_20px_rgba(0,183,235,0.1)]">
               <div className="flex justify-between items-center mb-6">
                 <h2 className="text-2xl font-bold text-white">
                   Daily Inspiration
                 </h2>
                 <button
                   onClick={fetchNewQuote}
-                  className="flex items-center gap-2 px-4 py-2 rounded-lg bg-black/50 border border-[#00B7EB]/60 text-white hover:bg-gray-900 transition-all duration-300 text-md font-semibold"
+                  className="flex items-center gap-2 px-4 py-2 rounded-lg bg-black/50 border border-white/20 text-white hover:bg-white/10 transition-all duration-300 text-md font-semibold"
                 >
-                  <FaRandom className="text-[#00B7EB]" /> New Quote
+                  <FaRandom className="text-white" /> New Quote
                 </button>
               </div>
 
               {loading ? (
                 <div className="animate-pulse space-y-4">
-                  <div className="h-6 bg-gray-800 rounded w-3/4"></div>
-                  <div className="h-6 bg-gray-800 rounded w-2/3"></div>
-                  <div className="h-4 bg-gray-800 rounded w-1/4 mt-4"></div>
+                  <div className="h-6 bg-white/10 rounded w-3/4"></div>
+                  <div className="h-6 bg-white/10 rounded w-2/3"></div>
+                  <div className="h-4 bg-white/10 rounded w-1/4 mt-4"></div>
                 </div>
               ) : quote && (
-                <>
-                  <div className="border-l-4 border-[#00B7EB] pl-4 mb-6">
+                <FollowerPointerCard 
+                  title={quote.author}
+                  className="cursor-none"
+                >
+                  <div className="border-l-4 border-white/20 pl-4 mb-6">
                     <p className="text-2xl font-serif font-bold italic mb-3 text-white leading-relaxed">
                       "{quote.quote}"
                     </p>
-                    <p className="text-lg font-semibold text-gray-400">- {quote.author}</p>
+                    <p className="text-lg font-semibold text-white/60">- {quote.author}</p>
                   </div>
+                </FollowerPointerCard>
+              )}
 
-                  <div className="flex flex-wrap gap-3">
+              <div className="flex flex-wrap gap-3">
+                <button
+                  onClick={handleCopy}
+                  className={`flex items-center gap-2 px-4 py-2 rounded-lg text-md font-semibold transition-all duration-300 ${
+                    copied
+                      ? 'bg-white/10 text-white'
+                      : 'bg-black/50 border border-white/20 text-white hover:bg-white/10'
+                  }`}
+                >
+                  {copied ? <><FaCheck size={12} /> Copied!</> : <><FaCopy size={12} /> Copy</>}
+                </button>
+                <button
+                  onClick={() => setShowShareOptions(!showShareOptions)}
+                  className="flex items-center gap-2 px-4 py-2 rounded-lg bg-black/50 border border-white/20 text-white hover:bg-white/10 text-md font-semibold transition-all duration-300"
+                >
+                  <FaShare size={12} /> Share
+                </button>
+                <button
+                  onClick={handleLike}
+                  className={`flex items-center gap-2 px-4 py-2 rounded-lg text-md font-semibold transition-all duration-300 ${
+                    liked
+                      ? 'bg-white/10 text-white'
+                      : 'bg-black/50 border border-white/20 text-white hover:bg-white/10'
+                  }`}
+                >
+                  <AiOutlineLike size={14} className={liked ? 'animate-pulse' : ''} />
+                  {liked ? 'Liked' : 'Like'}
+                </button>
+                <button
+                  onClick={handleSaveQuote}
+                  className={`flex items-center gap-2 px-4 py-2 rounded-lg text-md font-semibold transition-all duration-300 ${
+                    savedQuotes.some(q => q.quote === quote.quote)
+                      ? 'bg-white/10 text-white'
+                      : 'bg-black/50 border border-white/20 text-white hover:bg-white/10'
+                  }`}
+                >
+                  {savedQuotes.some(q => q.quote === quote.quote)
+                    ? <FaBookmark size={12} />
+                    : <FaRegBookmark size={12} />
+                  } Save
+                </button>
+              </div>
+
+              {/* Share Options Dropdown */}
+              {showShareOptions && (
+                <div className="mt-4 p-4 bg-black/50 rounded-lg border border-[#00B7EB]/30 animate-fadeIn">
+                  <div className="flex gap-3">
                     <button
-                      onClick={handleCopy}
-                      className={`flex items-center gap-2 px-4 py-2 rounded-lg text-md font-semibold transition-all duration-300 ${copied
-                        ? 'bg-[#00B7EB] text-white'
-                        : 'bg-black/50 border border-[#00B7EB]/30 text-white hover:bg-gray-900'
-                        }`}
+                      onClick={() => window.open(`https://facebook.com/sharer/sharer.php?u=${encodeURIComponent(window.location.href)}`, '_blank')}
+                      className="p-2 bg-black/50 border border-[#00B7EB]/30 text-white rounded-lg hover:bg-gray-900 transition-colors"
                     >
-                      {copied ? <><FaCheck size={12} /> Copied!</> : <><FaCopy size={12} /> Copy</>}
+                      <FaFacebook size={16} />
                     </button>
                     <button
-                      onClick={() => setShowShareOptions(!showShareOptions)}
-                      className="flex items-center gap-2 px-4 py-2 rounded-lg bg-black/50 border border-[#00B7EB]/30 text-white hover:bg-gray-900 text-md font-semibold transition-all duration-300"
+                      onClick={() => window.open(`https://twitter.com/intent/tweet?text=${encodeURIComponent(`"${quote.quote}" - ${quote.author}`)}`, '_blank')}
+                      className="p-2 bg-black/50 border border-[#00B7EB]/30 text-white rounded-lg hover:bg-gray-900 transition-colors"
                     >
-                      <FaShare size={12} /> Share
+                      <FaTwitter size={16} />
                     </button>
                     <button
-                      onClick={handleLike}
-                      className={`flex items-center gap-2 px-4 py-2 rounded-lg text-md font-semibold transition-all duration-300 ${liked
-                        ? 'bg-[#00B7EB] text-white'
-                        : 'bg-black/50 border border-[#00B7EB]/30 text-white hover:bg-gray-900'
-                        }`}
+                      onClick={() => window.open(`https://wa.me/?text=${encodeURIComponent(`"${quote.quote}" - ${quote.author}`)}`, '_blank')}
+                      className="p-2 bg-black/50 border border-[#00B7EB]/30 text-white rounded-lg hover:bg-gray-900 transition-colors"
                     >
-                      <AiOutlineLike size={14} className={liked ? 'animate-pulse' : ''} />
-                      {liked ? 'Liked' : 'Like'}
-                    </button>
-                    <button
-                      onClick={handleSaveQuote}
-                      className={`flex items-center gap-2 px-4 py-2 rounded-lg text-md font-semibold transition-all duration-300 ${savedQuotes.some(q => q.quote === quote.quote)
-                        ? 'bg-[#00B7EB] text-white'
-                        : 'bg-black/50 border border-[#00B7EB]/30 text-white hover:bg-gray-900'
-                        }`}
-                    >
-                      {savedQuotes.some(q => q.quote === quote.quote)
-                        ? <FaBookmark size={12} />
-                        : <FaRegBookmark size={12} />
-                      } Save
+                      <FaWhatsapp size={16} />
                     </button>
                   </div>
-
-                  {/* Share Options Dropdown */}
-                  {showShareOptions && (
-                    <div className="mt-4 p-4 bg-black/50 rounded-lg border border-[#00B7EB]/30 animate-fadeIn">
-                      <div className="flex gap-3">
-                        <button
-                          onClick={() => window.open(`https://facebook.com/sharer/sharer.php?u=${encodeURIComponent(window.location.href)}`, '_blank')}
-                          className="p-2 bg-black/50 border border-[#00B7EB]/30 text-white rounded-lg hover:bg-gray-900 transition-colors"
-                        >
-                          <FaFacebook size={16} />
-                        </button>
-                        <button
-                          onClick={() => window.open(`https://twitter.com/intent/tweet?text=${encodeURIComponent(`"${quote.quote}" - ${quote.author}`)}`, '_blank')}
-                          className="p-2 bg-black/50 border border-[#00B7EB]/30 text-white rounded-lg hover:bg-gray-900 transition-colors"
-                        >
-                          <FaTwitter size={16} />
-                        </button>
-                        <button
-                          onClick={() => window.open(`https://wa.me/?text=${encodeURIComponent(`"${quote.quote}" - ${quote.author}`)}`, '_blank')}
-                          className="p-2 bg-black/50 border border-[#00B7EB]/30 text-white rounded-lg hover:bg-gray-900 transition-colors"
-                        >
-                          <FaWhatsapp size={16} />
-                        </button>
-                      </div>
-                    </div>
-                  )}
-                </>
+                </div>
               )}
             </div>
 
             {/* Stats Section */}
-            <section className="bg-black/90 backdrop-blur-md p-8 rounded-lg max-w-4xl mx-auto">
-              <style>
-                {`
-      @keyframes statsSlide {
-        0% { opacity: 0; transform: translateY(20px); }
-        100% { opacity: 1; transform: translateY(0); }
-      }
-      @keyframes cardHover {
-        0% { transform: translateY(0); }
-        100% { transform: translateY(-4px); }
-      }
-    `}
-              </style>
-              <h3
-                className="text-3xl font-bold text-white text-center mb-8"
-                style={{ animation: "statsSlide 0.6s ease-in-out forwards" }}
-              >
+            <section className="bg-black/80 backdrop-blur-md p-8 rounded-lg max-w-4xl mx-auto border border-white/10 shadow-[0_0_20px_rgba(0,183,235,0.1)]">
+              <h3 className="text-3xl font-bold text-white text-center mb-8">
                 Activity Overview
               </h3>
               <div className="flex flex-col md:flex-row gap-6 justify-center">
@@ -326,19 +352,15 @@ const Dashboard = () => {
                 ].map((item, index) => (
                   <article
                     key={index}
-                    className="flex-1 p-6 bg-black/80 rounded-lg border border-gray-700 transition-all duration-300 hover:bg-black/90 hover:shadow-[0_0_10px_rgba(255,255,255,0.1)]"
-                    style={{
-                      animation: `statsSlide 0.6s ease-in-out ${0.2 + index * 0.2}s forwards`,
-                      opacity: 0,
-                    }}
+                    className="flex-1 p-6 bg-black/50 rounded-lg border border-white/10 transition-all duration-300 hover:bg-white/5 hover:shadow-[0_0_10px_rgba(255,255,255,0.1)]"
                   >
                     <div className="flex items-center gap-4">
-                      <div className="p-2 rounded-full bg-gray-800/50">
+                      <div className="p-2 rounded-full bg-white/10">
                         {React.cloneElement(item.icon, { className: "text-white" })}
                       </div>
                       <div>
                         <p className="text-2xl font-semibold text-white">{item.stat}</p>
-                        <p className="text-sm text-gray-400">{item.label}</p>
+                        <p className="text-sm text-white/60">{item.label}</p>
                       </div>
                     </div>
                   </article>
@@ -350,17 +372,17 @@ const Dashboard = () => {
           {/* Sidebar */}
           <div className="space-y-6">
             {/* Recent Quotes */}
-            <div className="bg-black/80 backdrop-blur-md p-6 rounded-xl border border-[#00B7EB]/10">
+            <div className="bg-black/80 backdrop-blur-md p-6 rounded-xl border border-white/10 shadow-[0_0_20px_rgba(0,183,235,0.1)]">
               <h3 className="text-xl font-bold mb-4 flex items-center gap-2 text-white">
-                <AiOutlineHistory size={22} className="text-[#00B7EB]" /> Recent Quotes
+                <AiOutlineHistory size={22} className="text-white" /> Recent Quotes
               </h3>
               <div className="space-y-3">
                 {quoteHistory.slice(1).map((historyQuote, index) => (
-                  <div key={index} className="p-3 rounded-lg bg-black/50 border border-[#00B7EB]/30 hover:border-[#00B7EB]/50 transition-colors">
+                  <div key={index} className="p-3 rounded-lg bg-black/50 border border-white/10 hover:border-white/20 transition-colors">
                     <p className="text-sm italic font-semibold text-white line-clamp-2">
                       "{historyQuote.quote}"
                     </p>
-                    <p className="text-xs font-medium text-gray-400 mt-1">
+                    <p className="text-xs font-medium text-white/60 mt-1">
                       - {historyQuote.author}
                     </p>
                   </div>
@@ -369,17 +391,17 @@ const Dashboard = () => {
             </div>
 
             {/* Saved Quotes */}
-            <div className="bg-black/80 backdrop-blur-md p-6 rounded-xl border border-[#00B7EB]/30">
+            <div className="bg-black/80 backdrop-blur-md p-6 rounded-xl border border-white/10 shadow-[0_0_20px_rgba(0,183,235,0.1)]">
               <h3 className="text-xl font-bold mb-4 flex items-center gap-2 text-white">
-                <FaBookmark className="text-[#00B7EB]" size={18} /> Saved Quotes
+                <FaBookmark className="text-white" size={18} /> Saved Quotes
               </h3>
               <div className="space-y-3">
                 {savedQuotes.slice(-3).map((savedQuote, index) => (
-                  <div key={index} className="p-3 rounded-lg bg-black/50 border border-[#00B7EB]/30 hover:border-[#00B7EB]/50 transition-colors">
+                  <div key={index} className="p-3 rounded-lg bg-black/50 border border-white/10 hover:border-white/20 transition-colors">
                     <p className="text-sm italic font-semibold text-white line-clamp-2">
                       "{savedQuote.quote}"
                     </p>
-                    <p className="text-xs font-medium text-gray-400 mt-1">
+                    <p className="text-xs font-medium text-white/60 mt-1">
                       - {savedQuote.author}
                     </p>
                   </div>

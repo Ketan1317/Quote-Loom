@@ -18,6 +18,9 @@ import { FaImages, FaQuoteLeft, FaGamepad } from "react-icons/fa";
 import { IoMdAdd } from "react-icons/io";
 import { CgProfile } from "react-icons/cg";
 import { motion, AnimatePresence } from "framer-motion";
+import { FollowerPointerCard } from "../Ui/following-pointer";
+import { GoogleGeminiEffect } from "../Ui/gemini-effect";
+import { TextGenerateEffect } from "../Ui/text-generate";
 
 const EditProfileModal = ({ profile, setProfile, setShowEdit, handleEditSubmit }) => (
   <motion.div
@@ -99,26 +102,28 @@ const AvatarSection = ({ avatarImage, handleAvatarClick, handleAvatarChange, fil
     animate={{ scale: 1 }}
     className="relative group"
   >
-    <motion.div
-      whileHover={{ rotate: 5 }}
-      className="w-32 h-32 rounded-full bg-gradient-to-r from-[#00B7EB] to-[#00A3D6] p-1 cursor-pointer"
-      onClick={handleAvatarClick}
-    >
-      <div className="w-full h-full rounded-full overflow-hidden bg-black/80 relative">
-        {avatarImage ? (
-          <img
-            src={avatarImage}
-            alt="Profile"
-            className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-110"
-          />
-        ) : (
-          <RiUserLine className="w-full h-full p-8 text-gray-500" />
-        )}
-        <div className="absolute inset-0 bg-black/60 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-300">
-          <RiCameraLine className="text-white" size={28} />
+    <FollowerPointerCard title="Change Avatar" className="cursor-pointer">
+      <motion.div
+        whileHover={{ rotate: 5 }}
+        className="w-32 h-32 rounded-full bg-gradient-to-r from-[#00B7EB] to-[#00A3D6] p-1 cursor-pointer"
+        onClick={handleAvatarClick}
+      >
+        <div className="w-full h-full rounded-full overflow-hidden bg-black/80 relative">
+          {avatarImage ? (
+            <img
+              src={avatarImage}
+              alt="Profile"
+              className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-110"
+            />
+          ) : (
+            <RiUserLine className="w-full h-full p-8 text-gray-500" />
+          )}
+          <div className="absolute inset-0 bg-black/60 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+            <RiCameraLine className="text-white" size={28} />
+          </div>
         </div>
-      </div>
-    </motion.div>
+      </motion.div>
+    </FollowerPointerCard>
     <input
       type="file"
       ref={fileInputRef}
@@ -136,7 +141,7 @@ const QuoteCard = ({ quote, handleLike, handleSave, handleShare }) => (
     whileHover={{ y: -5 }}
     className="bg-black/70 backdrop-blur-md rounded-xl p-6 border border-[#00B7EB]/20 hover:border-[#00B7EB]/40 transition-all duration-300 shadow-[0_0_10px_rgba(0,183,235,0.1)]"
   >
-    <p className="text-lg font-medium text-white mb-3 italic">"{quote.quote}"</p>
+    <TextGenerateEffect words={quote.quote} className="text-lg font-medium text-white mb-3 italic" />
     <p className="text-gray-400 text-sm font-semibold">- {quote.author}</p>
     <div className="flex justify-between items-center mt-4 pt-4 border-t border-[#00B7EB]/10">
       <div className="flex gap-6">
@@ -292,22 +297,15 @@ const Profile = () => {
 
   return (
     <div className="min-h-screen bg-black text-white font-['Poppins']">
-      <style>
-        {`
-          @keyframes slideIn {
-            0% { opacity: 0; transform: translateY(20px); }
-            100% { opacity: 1; transform: translateY(0); }
-          }
-          @keyframes fadeIn {
-            0% { opacity: 0; }
-            100% { opacity: 1; }
-          }
-          @keyframes pulse {
-            0%, 100% { transform: scale(1); }
-            50% { transform: scale(1.05); }
-          }
-        `}
-      </style>
+      {/* Gemini Effect Background */}
+      <div className="fixed top-0 left-0 w-full h-screen pointer-events-none">
+        <GoogleGeminiEffect 
+          pathLengths={[0.2, 0.4, 0.6, 0.8, 1]}
+          title="Profile"
+          description="."
+          className="absolute top-0 left-0 w-full h-full"
+        />
+      </div>
 
       {/* Navbar */}
       <nav className="sticky top-0 z-50 bg-black/90 backdrop-blur-md px-6 py-4 shadow-[0_2px_8px_rgba(0,183,235,0.1)]">
@@ -415,10 +413,12 @@ const Profile = () => {
                 animate={{ opacity: 1, y: 0 }}
                 className="text-3xl font-bold text-white mt-6"
               >
-                {profile.name}
+                <TextGenerateEffect words={profile.name} />
               </motion.h1>
               <p className="text-gray-300 mt-2 text-lg">@{profile.username}</p>
-              <p className="text-white text-md font-medium max-w-xs mt-3 leading-relaxed">{profile.bio}</p>
+              <p className="text-white text-md font-medium max-w-xs mt-3 leading-relaxed">
+                <TextGenerateEffect words={profile.bio} />
+              </p>
               <div className="flex gap-8 mt-6 mb-8">
                 <motion.span
                   initial={{ opacity: 0, x: -10 }}

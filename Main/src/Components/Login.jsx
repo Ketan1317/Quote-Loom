@@ -5,6 +5,7 @@ import { FaRegUser, FaLock, FaBars, FaTimes } from "react-icons/fa";
 import { MdEmail } from "react-icons/md";
 import { AiFillEye, AiFillEyeInvisible } from "react-icons/ai";
 import { FcGoogle } from "react-icons/fc";
+import { BackgroundBeamsWithCollision } from "../Ui/background-beams-with-collision";
 
 const Login = () => {
   const [showPassword, setShowPassword] = useState(false);
@@ -51,21 +52,19 @@ const Login = () => {
     if (validateForm()) {
       setIsLoading(true);
       try {
-        // Placeholder URL; replace with actual backend endpoint
-        const response = await fetch("https://api.example.com/login", {
+        const response = await fetch("http://localhost:8000/user/login", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
+          credentials: "include",
           body: JSON.stringify(loginData),
         });
 
         const data = await response.json();
         if (response.ok) {
-          localStorage.setItem("token", data.access_token);
-          localStorage.setItem("user", data.email);
-          alert("Login successful!");
-          navigate("/main");
+          localStorage.setItem("user", JSON.stringify(data.user));
+          navigate("/dashboard");
         } else {
-          setError(data.msg || "Login failed");
+          setError(data.error || "Login failed");
         }
       } catch (err) {
         console.error("Login error:", err);
@@ -121,7 +120,7 @@ const Login = () => {
       </nav>
 
       {/* Login Form */}
-      <main className="max-h-screen flex items-center justify-center py-14 px-4 relative">
+      <BackgroundBeamsWithCollision className="max-h-screen flex items-center justify-center py-14 px-4 relative">
         <div className="w-full max-w-md bg-black/80 backdrop-blur-md rounded-xl p-8 border border-[#00B7EB]/30">
           <form onSubmit={handleLoginSubmit} className="space-y-6">
             <div className="text-center text-3xl font-bold text-white mb-8">
@@ -224,7 +223,7 @@ const Login = () => {
             </div>
           </form>
         </div>
-      </main>
+      </BackgroundBeamsWithCollision>
     </div>
   );
 };

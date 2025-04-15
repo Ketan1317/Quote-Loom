@@ -8,6 +8,8 @@ import { IoMdAdd } from "react-icons/io";
 import { FaQuoteLeft } from "react-icons/fa";
 import { FaGamepad } from "react-icons/fa6";
 import { CgProfile } from "react-icons/cg";
+import { Lens } from "../Ui/lens";
+
 const defaultQuotes = [
     {
         text: "Be yourself; everyone else is already taken.",
@@ -322,98 +324,119 @@ const Quotes = () => {
                     </div>
 
                     {/* Quotes Grid */}
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-8 max-w-7xl mx-auto">
                         {loading ? (
-                            <div className="col-span-2 text-center py-12">
-                                <div className="animate-spin rounded-full h-12 w-12 border-4 border-[#00B7EB] border-t-transparent mx-auto"></div>
-                                <p className="mt-4 text-gray-400">Loading inspiring quotes...</p>
+                            <div className="col-span-2 text-center py-4">
+                                <div className="animate-spin rounded-full h-12 w-12 border-4 border-white border-t-transparent mx-auto"></div>
+                                <p className="mt-4 text-2xl text-gray-400">Loading inspiring quotes...</p>
                             </div>
                         ) : (
                             filteredQuotes.map((quote, index) => (
                                 <div
                                     key={index}
-                                    className={`bg-black/50 backdrop-blur-md rounded-lg p-6 border transition-all duration-300 group hover:border-[#00B7EB]/50 ${selectedForImage === index
-                                            ? 'border-[#00B7EB] shadow-[0_0_20px_rgba(0,183,235,0.3)] scale-[1.02]'
-                                            : 'border-[#00B7EB]/30'
-                                        }`}
+                                    onMouseEnter={() => setSelectedForImage(index)}
+                                    onMouseLeave={() => setSelectedForImage(null)}
+                                    className={`relative bg-black/50 backdrop-blur-xl rounded-xl p-8 border-2 transition-all duration-500 ease-out ${
+                                        selectedForImage === index 
+                                            ? 'border-white shadow-[0_0_30px_rgba(0,183,235,0.15)]' 
+                                            : 'border-white/20 hover:border-[#00B7EB]/30'
+                                    } ${
+                                        selectedForImage !== null && selectedForImage !== index 
+                                            ? 'blur-[2px] scale-95' 
+                                            : ''
+                                    }`}
                                 >
-                                    <div className="relative">
-                                        <div className="absolute -top-4 -left-4 text-[#00B7EB]/10 text-6xl font-serif">"</div>
-                                        <p className="text-lg text-white mb-3 pl-8 leading-relaxed font-serif italic">"{quote.text}"</p>
-                                        <p className="text-gray-400 text-sm pl-8">- {quote.author || "Unknown"}</p>
-                                    </div>
-                                    <div className="flex justify-between items-center mt-6 pt-4 border-t border-[#00B7EB]/10">
+                                    <Lens zoomFactor={1.3} lensSize={250}>
+                                        <div className="relative group cursor-pointer">
+                                            <div className="absolute -top-6 -left-6 text-8xl font-serif text-white/10 select-none transition-all duration-300 group-hover:text-[#00B7EB]/20">"</div>
+                                            <div className="space-y-6 select-none">
+                                                <p className="text-2xl md:text-3xl text-white mb-4 pl-8 leading-relaxed font-serif italic tracking-wide group-hover:text-white/90">
+                                                    {quote.text}
+                                                </p>
+                                                <p className="text-xl text-white/70 pl-8 font-medium group-hover:text-[#00B7EB]/80">
+                                                    - {quote.author || "Unknown"}
+                                                </p>
+                                            </div>
+                                        </div>
+                                    </Lens>
+                                    
+                                    <div className={`flex justify-between items-center mt-8 pt-6 border-t border-white/10 transition-opacity duration-300 ${
+                                        selectedForImage === index ? 'opacity-100' : 'opacity-0'
+                                    }`}>
                                         <div className="flex gap-4">
                                             <button
                                                 onClick={() => handleUseInImage(quote, index)}
-                                                className={`px-4 py-2 rounded-lg text-sm transition-all duration-300 flex items-center gap-2 ${selectedForImage === index
-                                                        ? 'bg-[#00B7EB] text-black shadow-[0_0_10px_rgba(0,183,235,0.5)]'
-                                                        : 'bg-black border border-[#00B7EB] text-white hover:bg-[#00B7EB] hover:text-black'
-                                                    }`}
+                                                className={`px-6 py-3 rounded-xl text-base font-medium transition-all duration-300 flex items-center gap-3 ${
+                                                    selectedForImage === index
+                                                        ? 'bg-[#00B7EB]/10 text-white border-2 border-[#00B7EB]/30 shadow-[0_0_20px_rgba(0,183,235,0.2)]'
+                                                        : 'bg-black/50 border-2 border-white text-white hover:bg-[#00B7EB]/5 hover:border-[#00B7EB]/20'
+                                                }`}
                                             >
                                                 {selectedForImage === index ? (
                                                     <>
-                                                        <FaCheck className="animate-bounce" />
+                                                        <FaCheck className="text-lg animate-bounce text-[#00B7EB]" />
                                                         <span>Selected</span>
                                                     </>
                                                 ) : (
                                                     <>
-                                                        <FaDownload className="group-hover:rotate-12 transition-transform duration-300" />
+                                                        <FaDownload className="text-lg group-hover:rotate-12 transition-transform duration-300" />
                                                         <span>Use in Image</span>
                                                     </>
                                                 )}
                                             </button>
                                             <button
                                                 onClick={() => handleCopy(quote, index)}
-                                                className={`px-4 py-2 rounded-lg text-sm transition-all duration-300 flex items-center gap-2 ${copiedId === index
-                                                        ? 'bg-[#00B7EB] text-black shadow-[0_0_10px_rgba(0,183,235,0.5)]'
-                                                        : 'bg-black border border-[#00B7EB] text-white hover:bg-[#00B7EB] hover:text-black'
-                                                    }`}
+                                                className={`px-6 py-3 rounded-xl text-base font-medium transition-all duration-300 flex items-center gap-3 ${
+                                                    copiedId === index
+                                                        ? 'bg-[#00B7EB]/10 text-white border-2 border-[#00B7EB]/30 shadow-[0_0_20px_rgba(0,183,235,0.2)]'
+                                                        : 'bg-black/50 border-2 border-white text-white hover:bg-[#00B7EB]/5 hover:border-[#00B7EB]/20'
+                                                }`}
                                             >
                                                 {copiedId === index ? (
                                                     <>
-                                                        <FaCheck className="animate-bounce" />
+                                                        <FaCheck className="text-lg animate-bounce text-[#00B7EB]" />
                                                         <span>Copied!</span>
                                                     </>
                                                 ) : (
                                                     <>
-                                                        <FaCopy className="group-hover:rotate-12 transition-transform duration-300" />
+                                                        <FaCopy className="text-lg group-hover:rotate-12 transition-transform duration-300" />
                                                         <span>Copy</span>
                                                     </>
                                                 )}
                                             </button>
                                             <button
                                                 onClick={() => toggleLike(index)}
-                                                className={`px-4 py-2 rounded-lg text-sm transition-all duration-300 ${likedQuotes.includes(index)
-                                                        ? 'bg-[#00B7EB] text-black shadow-[0_0_10px_rgba(0,183,235,0.5)]'
-                                                        : 'bg-black border border-[#00B7EB] text-white hover:bg-[#00B7EB] hover:text-black'
-                                                    }`}
+                                                className={`px-6 py-3 rounded-xl text-base font-medium transition-all duration-300 flex items-center gap-3 ${
+                                                    likedQuotes.includes(index)
+                                                        ? 'bg-[#00B7EB]/10 text-white border-2 border-[#00B7EB]/30 shadow-[0_0_20px_rgba(0,183,235,0.2)]'
+                                                        : 'bg-black/50 border-2 border-white text-white hover:bg-[#00B7EB]/5 hover:border-[#00B7EB]/20'
+                                                }`}
                                             >
-                                                <FaHeart className={`${likedQuotes.includes(index) ? 'animate-pulse' : ''}`} />
+                                                <FaHeart className={`text-lg ${likedQuotes.includes(index) ? 'animate-pulse text-[#00B7EB]' : ''}`} />
                                             </button>
                                         </div>
                                         <button
                                             onClick={() => handleShare(quote)}
-                                            className="text-gray-400 hover:text-[#00B7EB] transition-colors duration-300 group-hover:scale-110"
+                                            className="p-3 rounded-full bg-black/50 border-2 border-white/20 text-white/70 hover:text-[#00B7EB] hover:border-[#00B7EB]/30 hover:scale-110 transition-all duration-300"
                                         >
-                                            <FaShare />
+                                            <FaShare className="text-lg" />
                                         </button>
                                     </div>
                                 </div>
                             ))
                         )}
                     </div>
-                </div>
 
-                {/* No Results Message */}
-                {!loading && filteredQuotes.length === 0 && (
-                    <div className="col-span-2 text-center py-12">
-                        <div className="bg-black/50 backdrop-blur-md rounded-lg p-8 border border-[#00B7EB]/30">
-                            <p className="text-xl text-white mb-4">No quotes found</p>
-                            <p className="text-gray-400">Try adjusting your search terms</p>
+                    {/* No Results Message */}
+                    {!loading && filteredQuotes.length === 0 && (
+                        <div className="col-span-2 text-center py-12">
+                            <div className="bg-black/50 backdrop-blur-xl rounded-xl p-8 border-2 border-white/20">
+                                <p className="text-3xl text-white mb-4">No quotes found</p>
+                                <p className="text-xl text-white/70">Try adjusting your search terms</p>
+                            </div>
                         </div>
-                    </div>
-                )}
+                    )}
+                </div>
             </main>
         </div>
     );
