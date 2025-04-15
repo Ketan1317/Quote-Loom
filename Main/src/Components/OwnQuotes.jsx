@@ -259,7 +259,7 @@ const OwnQuotes = () => {
       title: "AI Generator",
       link: "#ai",
       thumbnail: (
-        <div className="bg-white/5 backdrop-blur-md rounded-lg p-6 border border-white/10">
+        <div className="bg-white/5 backdrop-blur-md rounded-lg p-6 border border-white/90">
           <h3 className="text-white text-xl font-bold mb-4">Generate Quotes</h3>
           <div className="space-y-4">
             <input
